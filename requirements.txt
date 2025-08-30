@@ -1,153 +1,15 @@
-# Core Flask Framework
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
 Werkzeug==3.0.1
 gunicorn==21.2.0
-
-# Image Processing & Computer Vision
-Pillow==10.0.1
-opencv-python==4.8.1.78
-numpy==1.24.3
-
-# HTTP Requests & APIs
+Pillow==10.4.0
 requests==2.31.0
-urllib3==2.0.4
-httpx==0.24.1
-
-# Environment & Configuration
 python-dotenv==1.0.0
 PyJWT==2.8.0
-
-# Database & Supabase
-supabase==2.0.2
-psycopg2-binary==2.9.7
-sqlalchemy==2.0.19
-
-# Blockchain & Web3
-web3==6.11.1
-eth-account==0.9.0
-eth-utils==2.2.0
-eth-hash==0.5.2
-
-# QR Code Generation
-qrcode[pil]==7.4.2
-
-# PDF Generation
+supabase==2.0.0
+web3==6.15.1
+eth-account==0.10.0
+qrcode==7.4.2
 reportlab==4.0.4
-fpdf2==2.7.4
-
-# Date & Time Processing
 python-dateutil==2.8.2
-pytz==2023.3
-
-# Data Processing & Analysis
-pandas==2.0.3
-scipy==1.11.1
-
-# Machine Learning & AI
-scikit-learn==1.3.0
-tensorflow==2.13.0
-torch==2.0.1
-torchvision==0.15.2
-
-# Natural Language Processing
-nltk==3.8.1
-textblob==0.17.1
-
-# Weather & Location Services
-geopy==2.3.0
-timezonefinder==6.2.0
-
-# Caching & Performance
-redis==4.6.0
-
-# Security & Encryption
-cryptography==41.0.3
-bcrypt==4.0.1
-
-# File Handling & Storage
-boto3==1.28.25
-cloudinary==1.33.0
-
-# Async & Concurrency
-aiohttp==3.8.5
-aiofiles==23.1.0
-
-# Monitoring & Logging
-sentry-sdk==1.29.2
-loguru==0.7.0
-
-# Testing (for development)
-pytest==7.4.0
-pytest-flask==1.2.0
-
-# Additional Utilities
-click==8.1.6
-markupsafe==2.1.3
-itsdangerous==2.1.2
-jinja2==3.1.2
 flask-cors==4.0.0
-flask-limiter==3.3.1
-
-# JSON & Data Serialization
-orjson==3.9.2
-marshmallow==3.20.1
-
-# Validation
-cerberus==1.3.4
-voluptuous==0.13.1
-
-# Background Tasks
-celery==5.3.1
-rq==1.15.1
-
-# Email Services
-flask-mail==0.9.1
-sendgrid==6.10.0
-
-# SMS Services
-twilio==8.5.0
-
-# Social Media Integration
-tweepy==4.14.0
-
-# Payment Processing
-stripe==5.5.0
-razorpay==1.3.0
-
-# Government API Integration
-zeep==4.2.1
-
-# Satellite & GIS Data
-rasterio==1.3.8
-geopandas==0.13.2
-folium==0.14.0
-
-# Voice Processing
-speechrecognition==3.10.0
-pydub==0.25.1
-
-# Chart & Visualization
-matplotlib==3.7.2
-seaborn==0.12.2
-plotly==5.15.0
-
-# Excel & CSV Processing
-openpyxl==3.1.2
-xlsxwriter==3.1.2
-
-# Blockchain IPFS
-ipfshttpclient==0.8.0a2
-
-# Additional Flask Extensions
-flask-wtf==1.1.1
-flask-login==0.6.2
-flask-migrate==4.0.4
-
-# API Documentation
-flask-restx==1.1.0
-flasgger==0.9.7.1
-
-# Internationalization
-flask-babel==3.1.0
-babel==2.12.1
