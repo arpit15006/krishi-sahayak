@@ -37,25 +37,9 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
-    from simple_run import User, db, ScanResult, DigitalPassport
-    # Temporary bypass: Create demo user and auto-login for testing
-    demo_user = User.query.filter_by(phone_number="9999999999").first()
-    if not demo_user:
-        # Create demo user
-        demo_user = User(
-            phone_number="9999999999",
-            full_name="Demo Farmer",
-            village_city="Demo Village",
-            pin_code="110001",
-            main_crops=json.dumps(['Rice', 'Wheat', 'Sugarcane']),
-            is_verified=True
-        )
-        db.session.add(demo_user)
-        db.session.commit()
-    
-    # Auto-login demo user
-    session['user_id'] = demo_user.id
-    session['phone_number'] = demo_user.phone_number
+    # Auto-login demo user for testing
+    session['user_id'] = 1
+    session['phone_number'] = "9999999999"
     
     if 'user_id' in session:
         return redirect(url_for('main.dashboard'))
@@ -63,8 +47,6 @@ def index():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    from simple_run import User, db
-    
     if request.method == 'POST':
         phone_number = request.form.get('phone_number')
         
@@ -72,20 +54,11 @@ def login():
             flash('Phone number is required', 'error')
             return render_template('login.html')
         
-        # In a real app, you would send OTP here
-        # For MVP, we'll simulate OTP verification
-        user = User.query.filter_by(phone_number=phone_number).first()
-        
-        if user:
-            session['user_id'] = user.id
-            session['phone_number'] = phone_number
-            flash('Login successful!', 'success')
-            return redirect(url_for('main.dashboard'))
-        else:
-            # New user, redirect to profile setup
-            session['phone_number'] = phone_number
-            flash('Please complete your profile setup', 'info')
-            return redirect(url_for('main.profile'))
+        # Demo login - accept any phone number
+        session['user_id'] = 1
+        session['phone_number'] = phone_number
+        flash('Login successful!', 'success')
+        return redirect(url_for('main.dashboard'))
     
     return render_template('login.html')
 
@@ -136,27 +109,27 @@ def profile():
 
 @bp.route('/dashboard')
 def dashboard():
-    from simple_run import User
-    
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
     
-    user = User.query.get(session['user_id'])
-    if not user:
-        return redirect(url_for('main.login'))
+    # Mock user data
+    user = {
+        'full_name': 'Demo Farmer',
+        'village_city': 'Demo Village', 
+        'pin_code': '110001',
+        'main_crops': ['Rice', 'Wheat', 'Sugarcane']
+    }
     
-    # Get weather data - try current location first, then user's PIN code
+    # Get weather data
     weather_data = get_weather_by_current_location()
     if weather_data.get('error'):
-        weather_data = get_weather_data(user.pin_code)
+        weather_data = get_weather_data(user['pin_code'])
     
-    # Get market prices for user's crops
-    user_crops = json.loads(user.main_crops)
-    # Add more popular crops to show comprehensive market data
-    all_crops = user_crops + ['Cotton', 'Maize', 'Onion', 'Potato', 'Tomato', 'Soybean', 'Groundnut', 'Turmeric', 'Chili', 'Garlic']
-    # Remove duplicates while preserving order
+    # Get market prices
+    user_crops = user['main_crops']
+    all_crops = user_crops + ['Cotton', 'Maize', 'Onion', 'Potato', 'Tomato']
     unique_crops = list(dict.fromkeys(all_crops))
-    market_data = get_market_prices(unique_crops[:13])  # Show up to 13 crops
+    market_data = get_market_prices(unique_crops[:10])
     
     return render_template('dashboard.html', 
                          user=user, 
@@ -165,8 +138,6 @@ def dashboard():
 
 @bp.route('/scanner', methods=['GET', 'POST'])
 def scanner():
-    from simple_run import User, ScanResult, db
-    
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
     
@@ -192,34 +163,26 @@ def scanner():
             try:
                 # Resize image if needed
                 with Image.open(filepath) as img:
-                    # Convert to RGB if needed
                     if img.mode != 'RGB':
                         img = img.convert('RGB')
-                    
-                    # Resize if too large
                     max_size = (1024, 1024)
                     img.thumbnail(max_size, Image.LANCZOS)
                     img.save(filepath, 'JPEG', quality=85)
                 
                 # Get AI analysis
-                user = User.query.get(session['user_id'])
-                weather_data = get_weather_data(user.pin_code)
-                
+                weather_data = get_weather_data('110001')
                 analysis_result = analyze_plant_image(filepath, weather_data)
                 
-                # Save scan result
-                scan_result = ScanResult(
-                    user_id=session['user_id'],
-                    image_filename=filename,
-                    diagnosis=analysis_result['diagnosis'],
-                    treatment_advice=analysis_result['treatment'],
-                    weather_warning=analysis_result.get('weather_warning')
-                )
+                # Store result in session for demo
+                session['last_scan_result'] = {
+                    'id': 1,
+                    'image_filename': filename,
+                    'diagnosis': analysis_result['diagnosis'],
+                    'treatment_advice': analysis_result['treatment'],
+                    'weather_warning': analysis_result.get('weather_warning')
+                }
                 
-                db.session.add(scan_result)
-                db.session.commit()
-                
-                return redirect(url_for('main.results', scan_id=scan_result.id))
+                return redirect(url_for('main.results', scan_id=1))
                 
             except Exception as e:
                 current_app.logger.error(f"Error processing image: {str(e)}")
@@ -231,12 +194,11 @@ def scanner():
 
 @bp.route('/results/<int:scan_id>')
 def results(scan_id):
-    from simple_run import ScanResult
-    
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
     
-    scan_result = ScanResult.query.filter_by(id=scan_id, user_id=session['user_id']).first()
+    # Get result from session
+    scan_result = session.get('last_scan_result')
     if not scan_result:
         flash('Scan result not found', 'error')
         return redirect(url_for('main.scanner'))
