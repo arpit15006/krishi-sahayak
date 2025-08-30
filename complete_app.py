@@ -82,8 +82,7 @@ def time_ago(date_str):
     except:
         return 'अभी'
 
-# Import passport routes
-from routes_package.passport_routes import passport_bp
+# Passport routes are defined directly in this file - no blueprint needed
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -1582,8 +1581,7 @@ def generate_qr_label(token_id):
         app.logger.error(f"QR label generation error: {str(e)}")
         return f'<h1>Error</h1><p>Failed to generate QR label: {str(e)}</p>', 500
 
-# Register passport blueprint
-app.register_blueprint(passport_bp)
+# All routes are defined directly in this file - no blueprints needed
 
 # Test QR generation endpoint
 @app.route('/test-qr')
