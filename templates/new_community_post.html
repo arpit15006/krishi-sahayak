@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}नया सवाल - किसान समुदाय{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-success mb-1">❓ नया सवाल पूछें</h2>
+                    <p class="text-muted mb-0">अपनी समस्या साझा करें और समुदाय से मदद पाएं</p>
+                </div>
+                <a href="{{ url_for('community') }}" class="btn btn-outline-success">
+                    <i class="fas fa-arrow-left"></i> वापस
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-lg-8 col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <!-- Post Type -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">पोस्ट का प्रकार</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_question" id="is_question" checked>
+                                <label class="form-check-label" for="is_question">
+                                    ❓ यह एक सवाल है (AI सलाहकार स्वचालित जवाब देगा)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-bold">शीर्षक *</label>
+                            <input type="text" class="form-control form-control-lg" id="title" name="title" 
+                                   placeholder="अपने सवाल का संक्षिप्त शीर्षक लिखें..." required maxlength="200">
+                            <div class="form-text">उदाहरण: "धान की पत्तियों पर भूरे धब्बे दिख रहे हैं"</div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-4">
+                            <label for="category" class="form-label fw-bold">श्रेणी *</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">श्रेणी चुनें</option>
+                                {% for category in categories %}
+                                <option value="{{ category.name }}">{{ category.icon }} {{ category.description }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-4">
+                            <label for="content" class="form-label fw-bold">विस्तार से बताएं *</label>
+                            <textarea class="form-control" id="content" name="content" rows="8" 
+                                      placeholder="अपनी समस्या का विस्तार से वर्णन करें..." required></textarea>
+                            <div class="form-text">
+                                जितनी अधिक जानकारी देंगे, उतना बेहतर जवाब मिलेगा। शामिल करें:
+                                <ul class="mt-2 mb-0">
+                                    <li>फसल का नाम और किस्म</li>
+                                    <li>समस्या कब से है</li>
+                                    <li>मौसम की स्थिति</li>
+                                    <li>पहले क्या उपचार किया है</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane"></i> सवाल पोस्ट करें
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4 col-12 mt-4 mt-lg-0">
+            <!-- Tips Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <h5 class="card-title text-success">💡 बेहतर जवाब के लिए टिप्स</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            स्पष्ट और संक्षिप्त शीर्षक लिखें
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            समस्या का विस्तार से वर्णन करें
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            सही श्रेणी चुनें
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            यदि संभव हो तो फोटो भी साझा करें
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success me-2"></i>
+                            विनम्र भाषा का उपयोग करें
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- AI Assistant Info -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3">
+                    <h5 class="card-title text-primary">🤖 AI कृषि सलाहकार</h5>
+                    <p class="card-text text-muted mb-3">
+                        जब आप सवाल पोस्ट करते हैं, तो हमारा AI सलाहकार तुरंत एक प्रारंभिक जवाब देता है।
+                    </p>
+                    <div class="alert alert-info py-2 px-3 mb-0">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            AI का जवाब सिर्फ सुझाव है। अंतिम निर्णय हमेशा अनुभवी किसानों की सलाह के बाद लें।
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-resize textarea
+document.getElementById('content').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const title = document.getElementById('title').value.trim();
+    const content = document.getElementById('content').value.trim();
+    const category = document.getElementById('category').value;
+    
+    if (!title || !content || !category) {
+        e.preventDefault();
+        alert('कृपया सभी आवश्यक फील्ड भरें');
+        return;
+    }
+    
+    if (title.length < 10) {
+        e.preventDefault();
+        alert('शीर्षक कम से कम 10 अक्षर का होना चाहिए');
+        return;
+    }
+    
+    if (content.length < 20) {
+        e.preventDefault();
+        alert('विवरण कम से कम 20 अक्षर का होना चाहिए');
+        return;
+    }
+});
+
+// Character counter for title
+document.getElementById('title').addEventListener('input', function() {
+    const maxLength = 200;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
+    
+    // Create or update character counter
+    let counter = document.getElementById('titleCounter');
+    if (!counter) {
+        counter = document.createElement('div');
+        counter.id = 'titleCounter';
+        counter.className = 'form-text text-end';
+        this.parentNode.appendChild(counter);
+    }
+    
+    counter.textContent = `${currentLength}/${maxLength} अक्षर`;
+    counter.className = `form-text text-end ${remaining < 20 ? 'text-warning' : ''}`;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,703 @@
+{% extends "base.html" %}
+
+{% block title %}{{ get_text('passport') }} - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="h2 mb-3">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            {{ get_text('digital_crop_passport') }}
+        </h1>
+        <p class="lead text-muted">
+            {{ get_text('generate_qr') }}
+        </p>
+    </div>
+
+    <!-- Existing Passports -->
+    {% if passports %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 00-2 2v2m0 0V9a2 2 0 012-2m0 4a2 2 0 01-2-2m0 0V7a2 2 0 012-2"></path>
+                </svg>
+                {{ get_text('digital_crop_passport') }} ({{ passports|length }})
+            </h3>
+            
+            <div class="row g-4">
+                {% for passport in passports %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="passport-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 class="h5 mb-1">{{ passport.crop_type }}</h4>
+                                <small class="opacity-75">{{ passport.season }} Season</small>
+                            </div>
+                            <span class="badge bg-success">Verified</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <small class="opacity-75">Token ID</small>
+                                    <div class="fw-bold">{{ passport.nft_token_id }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="opacity-75">Created</small>
+                                    <div class="fw-bold">{{ passport.created_at | format_date }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="qr-code text-center mb-3">
+                            <img id="qr-{{ passport.nft_token_id }}" width="80" height="80" alt="QR Code" class="border rounded" style="background: white;">
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="/certificate/{{ passport.nft_token_id }}" class="btn btn-sm btn-success me-2">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                PDF Certificate
+                            </a>
+                            <button class="btn btn-sm btn-outline-light me-2" onclick="viewOnBlockchain('{{ passport.nft_token_id }}')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Verify
+                            </button>
+                            <button class="btn btn-sm btn-success me-2" onclick="generateQRForPassport('{{ passport.nft_token_id }}', '{{ passport.crop_type }}')">
+                                📱 Generate QR
+                            </button>
+                            <a href="/qr-label/{{ passport.nft_token_id }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                                🖨️ Print Label
+                            </a>
+                            <button class="btn btn-sm btn-outline-light" onclick="sharePassport('{{ passport.id }}')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                                </svg>
+                                Share
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="opacity-75">
+                                IPFS: {{ passport.ipfs_hash[:20] }}...
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Create New Passport -->
+    <div class="row mb-5">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    {{ get_text('create_new') }}
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('passport') }}">
+                        <div class="row g-4">
+                            <div class="col-12 col-md-6">
+                                <label for="crop_type" class="form-label">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                    {{ get_text('crop_type') }}
+                                </label>
+                                <select class="form-select" id="crop_type" name="crop_type" required>
+                                    <option value="">Choose crop...</option>
+                                    <option value="Rice">🌾 Rice</option>
+                                    <option value="Wheat">🌾 Wheat</option>
+                                    <option value="Maize">🌽 Maize (Corn)</option>
+                                    <option value="Sugarcane">🎋 Sugarcane</option>
+                                    <option value="Cotton">🌸 Cotton</option>
+                                    <option value="Soybean">🫘 Soybean</option>
+                                    <option value="Groundnut">🥜 Groundnut (Peanut)</option>
+                                    <option value="Sunflower">🌻 Sunflower</option>
+                                    <option value="Mustard">🌼 Mustard</option>
+                                    <option value="Bajra">🌾 Bajra (Pearl Millet)</option>
+                                    <option value="Jowar">🌾 Jowar (Sorghum)</option>
+                                    <option value="Barley">🌾 Barley</option>
+                                    <option value="Chickpea">🫛 Chickpea (Chana)</option>
+                                    <option value="Pigeon Pea">🫛 Pigeon Pea (Arhar)</option>
+                                    <option value="Black Gram">🫘 Black Gram (Urad)</option>
+                                    <option value="Green Gram">🫛 Green Gram (Moong)</option>
+                                    <option value="Lentil">🫛 Lentil (Masoor)</option>
+                                    <option value="Potato">🥔 Potato</option>
+                                    <option value="Onion">🧅 Onion</option>
+                                    <option value="Tomato">🍅 Tomato</option>
+                                    <option value="Chili">🌶️ Chili</option>
+                                    <option value="Turmeric">🟡 Turmeric</option>
+                                    <option value="Ginger">🫚 Ginger</option>
+                                    <option value="Garlic">🧄 Garlic</option>
+                                    <option value="Banana">🍌 Banana</option>
+                                    <option value="Mango">🥭 Mango</option>
+                                    <option value="Orange">🍊 Orange</option>
+                                    <option value="Apple">🍎 Apple</option>
+                                    <option value="Grapes">🍇 Grapes</option>
+                                    <option value="Coconut">🥥 Coconut</option>
+                                    <option value="Tea">🍃 Tea</option>
+                                    <option value="Coffee">☕ Coffee</option>
+                                    <option value="Rubber">🌳 Rubber</option>
+                                    <option value="Cardamom">🌿 Cardamom</option>
+                                    <option value="Black Pepper">⚫ Black Pepper</option>
+                                    <option value="Other">🌱 Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="season" class="form-label">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    {{ get_text('season') }}
+                                </label>
+                                <select class="form-select" id="season" name="season" required>
+                                    <option value="">Choose season...</option>
+                                    <option value="Kharif 2024">Kharif 2024 (Monsoon)</option>
+                                    <option value="Rabi 2024-25">Rabi 2024-25 (Winter)</option>
+                                    <option value="Zaid 2025">Zaid 2025 (Summer)</option>
+                                    <option value="Kharif 2025">Kharif 2025 (Monsoon)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="sowing_date" class="form-label">🌱 {{ get_text('sowing_date') }}</label>
+                                <input type="date" class="form-control" id="sowing_date" name="sowing_date" required>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="harvest_date" class="form-label">🌾 {{ get_text('harvest_date') }}</label>
+                                <input type="date" class="form-control" id="harvest_date" name="harvest_date" required>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="area" class="form-label">📏 {{ get_text('area') }}</label>
+                                <input type="number" class="form-control" id="area" name="area" step="0.1" min="0.1" required>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="variety" class="form-label">🌿 {{ get_text('variety') }}</label>
+                                <input type="text" class="form-control" id="variety" name="variety" placeholder="e.g., Basmati, IR64" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="practices" class="form-label">🌱 {{ get_text('farming_practices') }}</label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="organic" name="practices" value="Organic" checked>
+                                            <label class="form-check-label" for="organic">{{ get_text('organic') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="sustainable" name="practices" value="Sustainable" checked>
+                                            <label class="form-check-label" for="sustainable">{{ get_text('sustainable') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="drip" name="practices" value="Drip Irrigation" checked>
+                                            <label class="form-check-label" for="drip">Drip Irrigation</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="create_qr" name="create_qr" checked>
+                                <label class="form-check-label" for="create_qr">
+                                    📱 <strong>Generate Supply Chain QR Code</strong>
+                                </label>
+                                <div class="form-text">Create a QR code that consumers can scan to see your farm details and crop journey</div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <strong>What is a Digital Crop Passport?</strong><br>
+                                A blockchain-based certificate that proves the authenticity and traceability of your crops. 
+                                This helps you access premium markets and build trust with buyers.
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <input type="submit" value="🔐 {{ get_text('create_new') }}" class="btn btn-success btn-lg" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weather Shield Section -->
+    <div class="row">
+        <div class="col-12 col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    Weather Shield - Parametric Insurance
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-md-8">
+                            <h4 class="mb-3">Protect Your Crops with Smart Insurance</h4>
+                            <p class="mb-4">
+                                Weather Shield uses blockchain and weather data to automatically pay out insurance 
+                                when extreme weather events affect your crops. No paperwork, no claims process - 
+                                just automatic protection.
+                            </p>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-12 col-sm-6">
+                                    <div class="d-flex align-items-center">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Automatic payouts
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="d-flex align-items-center">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        No paperwork required
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="d-flex align-items-center">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Blockchain secured
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="d-flex align-items-center">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Instant settlements
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-3 flex-wrap">
+                                <button class="btn btn-primary weather-shield-btn">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                    Activate Weather Shield
+                                </button>
+                                
+                                <button class="btn btn-outline-warning simulate-weather-btn">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Simulate Extreme Weather Event
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-4 text-center">
+                            <svg width="150" height="150" viewBox="0 0 150 150" class="img-fluid">
+                                <!-- Weather Shield Illustration -->
+                                <circle cx="75" cy="75" r="70" fill="#e0f2fe" stroke="#3b82f6" stroke-width="2"/>
+                                <circle cx="75" cy="75" r="50" fill="#dbeafe"/>
+                                
+                                <!-- Shield -->
+                                <path d="M75 25 L95 45 L95 85 C95 95, 85 105, 75 105 C65 105, 55 95, 55 85 L55 45 Z" fill="#10b981" stroke="#059669" stroke-width="2"/>
+                                
+                                <!-- Checkmark -->
+                                <path d="M65 75 L73 83 L88 60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                
+                                <!-- Weather elements -->
+                                <circle cx="45" cy="45" r="8" fill="#fbbf24"/>
+                                <path d="M105 40 Q110 35, 115 40 Q120 35, 125 40 Q125 50, 115 50 Q105 50, 105 40" fill="#94a3b8"/>
+                                <path d="M108 55 L110 65 M115 55 L117 65 M122 55 L124 65" stroke="#94a3b8" stroke-width="1"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- QR Code Display Section -->
+    {% if latest_qr %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        📱 Supply Chain QR Code Generated!
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-md-6 text-center">
+                            <h5>QR Code for Product Packaging</h5>
+                            <div class="qr-code-display mb-3">
+                                <img src="data:image/png;base64,{{ latest_qr.qr_code }}" alt="Supply Chain QR Code" class="img-fluid" style="max-width: 200px;">
+                            </div>
+                            <p class="small text-muted">Print this QR code on your product packaging</p>
+                            <button class="btn btn-outline-success" onclick="downloadQR()">
+                                📥 Download QR Code
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <h5>Consumer Experience</h5>
+                            <div class="consumer-preview">
+                                <p>When consumers scan this QR code, they will see:</p>
+                                <ul class="text-start">
+                                    <li>👨🌾 Your farmer profile</li>
+                                    <li>🌾 Crop details & harvest date</li>
+                                    <li>🚚 Farm to fork journey</li>
+                                    <li>🏆 Certifications & quality</li>
+                                    <li>📞 Option to connect with you</li>
+                                </ul>
+                                <a href="{{ latest_qr.qr_url }}" target="_blank" class="btn btn-primary">
+                                    👀 Preview Consumer View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function downloadQR() {
+    const qrImage = document.querySelector('.qr-code-display img');
+    if (qrImage) {
+        const link = document.createElement('a');
+        link.download = 'supply-chain-qr-code.png';
+        link.href = qrImage.src;
+        link.click();
+    }
+}
+
+function generateQRForPassport(passportId, cropType) {
+    console.log('Generating QR for passport:', passportId, cropType);
+    
+    // Show loading indicator
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '⏳ Generating...';
+    button.disabled = true;
+    
+    fetch('/api/generate-qr', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            passport_id: passportId,
+            crop_type: cropType
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        if (data.success) {
+            showQRModal(data.qr_code, data.qr_url, passportId);
+        } else {
+            alert('Error generating QR code: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalText;
+        button.disabled = false;
+        alert('Failed to generate QR code: ' + error.message);
+    });
+}
+
+function showQRModal(qrCode, qrUrl, passportId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade show';
+    modal.style.display = 'block';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.zIndex = '9999';
+    
+    const qrImageSrc = qrCode.startsWith('data:') ? qrCode : `data:image/png;base64,${qrCode}`;
+    
+    modal.innerHTML = `
+        <div class="modal-dialog" style="margin-top: 50px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📜 Digital Crop Certificate</h5>
+                    <button type="button" class="btn-close" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body text-center">
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <img src="${qrImageSrc}" alt="QR Code" class="img-fluid" style="max-width: 200px; width: 200px; height: 200px;">
+                    </div>
+                    <p>Scan QR code to verify certificate authenticity</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <a href="/certificate/${passportId}" class="btn btn-success">📜 Download Certificate</a>
+                        <a href="/qr-label/${passportId}" target="_blank" class="btn btn-primary">🖨️ Print QR Label</a>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">📱 Scanning this QR downloads the certificate directly</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function downloadQRFromModal(qrImageSrc) {
+    const link = document.createElement('a');
+    link.download = 'crop-passport-qr.png';
+    link.href = qrImageSrc;
+    link.click();
+}
+</script>
+
+<style>
+.qr-code-display {
+    background: #f8f9fa;
+    border: 2px dashed #28a745;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.consumer-preview {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.consumer-preview ul {
+    display: inline-block;
+    text-align: left;
+}
+
+/* Enhanced checkbox styling */
+.form-check-input {
+    width: 1.5em !important;
+    height: 1.5em !important;
+    border: 2px solid #28a745 !important;
+    border-radius: 4px !important;
+    background-color: white !important;
+    cursor: pointer !important;
+}
+
+.form-check-input:checked {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.form-check-input:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+}
+
+.form-check-label {
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    color: #2d5016 !important;
+    cursor: pointer !important;
+    margin-left: 0.5rem !important;
+}
+
+.form-check {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    background: #f8fafc !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-check:hover {
+    background: #e2e8f0 !important;
+    border-color: #28a745 !important;
+}
+
+.form-check:has(.form-check-input:checked) {
+    background: #dcfce7 !important;
+    border-color: #28a745 !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// View passport on IPFS
+function viewOnBlockchain(tokenId) {
+    // For now, show verification info instead of external link
+    showNotification('🔍 Verifying passport on MONAD blockchain...', 'info');
+    
+    // In a real implementation, this would verify against MONAD
+    setTimeout(() => {
+        showNotification(`✅ Passport ${tokenId} verified on MONAD blockchain!`, 'success');
+    }, 1500);
+}
+
+// Share passport
+function sharePassport(passportId) {
+    const shareUrl = `${window.location.origin}/passport/verify/${passportId}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Krishi Sahayak - Digital Crop Passport',
+            text: 'Verify this blockchain-certified crop passport',
+            url: shareUrl
+        }).then(() => {
+            showNotification('✅ Passport shared successfully!', 'success');
+        }).catch((error) => {
+            console.log('Error sharing:', error);
+            fallbackShare(shareUrl);
+        });
+    } else {
+        fallbackShare(shareUrl);
+    }
+}
+
+function fallbackShare(url) {
+    // Copy to clipboard fallback
+    navigator.clipboard.writeText(url).then(() => {
+        showNotification('📋 Passport link copied to clipboard!', 'success');
+    }).catch(() => {
+        // Show modal with sharing options
+        const encodedUrl = encodeURIComponent(url);
+        const text = encodeURIComponent('Verify this blockchain-certified crop passport');
+        
+        const modal = document.createElement('div');
+        modal.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center';
+        modal.style.cssText = 'background: rgba(0,0,0,0.5); z-index: 9999;';
+        modal.innerHTML = `
+            <div class="card" style="max-width: 400px; margin: 20px;">
+                <div class="card-header">
+                    <h4 class="mb-0">Share Passport</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" value="${url}" readonly id="shareUrl">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="https://wa.me/?text=${text}%20${encodedUrl}" target="_blank" class="btn btn-success">
+                            📱 WhatsApp
+                        </a>
+                        <button class="btn btn-primary" onclick="copyShareUrl()">
+                            📋 Copy Link
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeShareModal()">
+                            ❌ Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        window.closeShareModal = function() {
+            document.body.removeChild(modal);
+        };
+        
+        window.copyShareUrl = function() {
+            document.getElementById('shareUrl').select();
+            document.execCommand('copy');
+            showNotification('✅ Link copied!', 'success');
+            closeShareModal();
+        };
+    });
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animations to passport cards
+    const passportCards = document.querySelectorAll('.passport-card');
+    passportCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('fade-in');
+        }, index * 200);
+    });
+});
+
+// Generate real QR codes for passports
+document.addEventListener('DOMContentLoaded', function() {
+    const qrImages = document.querySelectorAll('[id^="qr-"]');
+    console.log('Found QR images:', qrImages.length);
+    
+    qrImages.forEach((img, index) => {
+        const tokenId = img.id.replace('qr-', '');
+        console.log(`Loading QR for token ${tokenId}`);
+        
+        // Add loading placeholder
+        img.style.background = '#f8f9fa';
+        img.alt = 'Loading QR...';
+        
+        fetch(`/qr/${tokenId}?t=${Date.now()}`)
+            .then(response => {
+                console.log(`QR response for ${tokenId}:`, response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`QR data for ${tokenId}:`, data);
+                if (data.qr_code) {
+                    // Ensure proper data URL format
+                    const qrSrc = data.qr_code.startsWith('data:') ? data.qr_code : `data:image/png;base64,${data.qr_code}`;
+                    img.src = qrSrc;
+                    img.alt = 'QR Code';
+                    img.style.background = 'white';
+                    img.style.padding = '5px';
+                } else {
+                    throw new Error('No QR code in response');
+                }
+            })
+            .catch(error => {
+                console.error(`Error generating QR code for ${tokenId}:`, error);
+                img.alt = 'QR unavailable';
+                img.style.background = '#ffebee';
+                img.style.color = '#c62828';
+                img.innerHTML = '❌';
+            });
+    });
+});
+</script>
+{% endblock %}

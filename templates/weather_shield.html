@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Weather Shield - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="h2 mb-3">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            Weather Shield Insurance
+        </h1>
+        <p class="lead text-muted">
+            Blockchain-powered parametric insurance for weather protection
+        </p>
+    </div>
+
+    <!-- Demo Insurance Card -->
+    <div class="row mb-5">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">🛡️ Demo Weather Insurance Policy</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-6">
+                            <h5>Policy Details</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Coverage:</strong> Heavy Rainfall (>200mm/day)</li>
+                                <li><strong>Premium:</strong> ₹500 (Demo: Free)</li>
+                                <li><strong>Payout:</strong> ₹5,000 (10x premium)</li>
+                                <li><strong>Duration:</strong> 30 days</li>
+                                <li><strong>Location:</strong> Your PIN code area</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <h5>How It Works</h5>
+                            <ol>
+                                <li>Buy policy with one click</li>
+                                <li>Weather oracle monitors rainfall</li>
+                                <li>Automatic payout if conditions met</li>
+                                <li>No paperwork, no claims process</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button id="buy-policy-btn" class="btn btn-success btn-lg me-3" onclick="buyDemoPolicy()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                            Buy Demo Policy (Free)
+                        </button>
+                        
+                        <button id="simulate-weather-btn" class="btn btn-warning btn-lg" onclick="simulateExtremeWeather()" style="display: none;">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            🌧️ SIMULATE EXTREME WEATHER
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Policy Status -->
+    <div id="policy-status" class="row mb-5" style="display: none;">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📋 Your Active Policy</h4>
+                </div>
+                <div class="card-body" id="policy-details">
+                    <!-- Policy details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payout History -->
+    <div id="payout-history" class="row mb-5" style="display: none;">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">💰 Payout Received!</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="h2 text-success mb-3">₹5,000</div>
+                        <p class="lead">Automatic payout triggered by extreme weather event!</p>
+                        <p class="text-muted">Transaction processed on MONAD blockchain</p>
+                        
+                        <div class="alert alert-info mt-4">
+                            <h5>🎉 Demo Complete!</h5>
+                            <p class="mb-0">This demonstrates how parametric insurance works. In production, real weather data would trigger automatic payouts to farmers affected by extreme weather.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">🔧 How Weather Shield Works</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-3">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-primary">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                                <h5>1. Buy Policy</h5>
+                                <p class="text-muted">Purchase parametric insurance with cryptocurrency or mobile money</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-3">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <h5>2. Oracle Monitoring</h5>
+                                <p class="text-muted">Weather oracles continuously monitor rainfall, temperature, and other parameters</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-3">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <h5>3. Event Detection</h5>
+                                <p class="text-muted">Smart contract automatically detects when weather conditions exceed thresholds</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-3">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                    </svg>
+                                </div>
+                                <h5>4. Instant Payout</h5>
+                                <p class="text-muted">Automatic payout sent directly to farmer's wallet within minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let policyActive = false;
+
+function buyDemoPolicy() {
+    const button = document.getElementById('buy-policy-btn');
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    
+    // Simulate policy purchase
+    setTimeout(() => {
+        policyActive = true;
+        
+        // Update UI
+        button.style.display = 'none';
+        document.getElementById('simulate-weather-btn').style.display = 'inline-block';
+        document.getElementById('policy-status').style.display = 'block';
+        
+        // Show policy details
+        document.getElementById('policy-details').innerHTML = `
+            <div class="row g-4">
+                <div class="col-12 col-md-6">
+                    <h5>✅ Policy Active</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Policy ID:</strong> WS-${Date.now()}</li>
+                        <li><strong>Premium Paid:</strong> ₹0 (Demo)</li>
+                        <li><strong>Coverage Amount:</strong> ₹5,000</li>
+                        <li><strong>Valid Until:</strong> ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6">
+                    <h5>📊 Monitoring</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Location:</strong> Your PIN code area</li>
+                        <li><strong>Trigger:</strong> Rainfall > 200mm/day</li>
+                        <li><strong>Status:</strong> <span class="badge bg-success">Active Monitoring</span></li>
+                        <li><strong>Oracle:</strong> AccuWeather API</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        showNotification('🛡️ Demo policy activated! Click "SIMULATE EXTREME WEATHER" to test payout.', 'success');
+    }, 2000);
+}
+
+function simulateExtremeWeather() {
+    const button = document.getElementById('simulate-weather-btn');
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Triggering Event...';
+    
+    // Simulate extreme weather detection
+    setTimeout(() => {
+        // Show payout
+        document.getElementById('payout-history').style.display = 'block';
+        document.getElementById('policy-status').style.display = 'none';
+        button.style.display = 'none';
+        
+        // Scroll to payout section
+        document.getElementById('payout-history').scrollIntoView({ behavior: 'smooth' });
+        
+        showNotification('💰 Automatic payout of ₹5,000 triggered by extreme weather!', 'success');
+        
+        // Confetti effect
+        if (typeof confetti !== 'undefined') {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

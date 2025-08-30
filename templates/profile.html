@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}{{ get_text('profile') }} - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>🌾 {{ get_text('farmer_profile') }}</h2>
+                    <p class="mb-0 text-muted">{{ get_text('profile') }}</p>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        <!-- Full Name -->
+                        <div class="mb-4">
+                            <label for="full_name" class="form-label">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                {{ get_text('full_name') }}
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="full_name" 
+                                name="full_name" 
+                                placeholder="Enter your full name"
+                                required
+                                autocomplete="name"
+                            >
+                        </div>
+
+                        <!-- Village/City -->
+                        <div class="mb-4">
+                            <label for="village_city" class="form-label">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                {{ get_text('village_city') }}
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="village_city" 
+                                name="village_city" 
+                                placeholder="Enter your village or city name"
+                                required
+                                autocomplete="address-level2"
+                            >
+                        </div>
+
+                        <!-- PIN Code -->
+                        <div class="mb-4">
+                            <label for="pin_code" class="form-label">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                </svg>
+                                {{ get_text('pin_code') }}
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="pin_code" 
+                                name="pin_code" 
+                                placeholder="Enter 6-digit PIN code"
+                                pattern="[0-9]{6}"
+                                maxlength="6"
+                                required
+                                autocomplete="postal-code"
+                            >
+                            <div class="form-text">
+                                This helps us provide accurate weather and market data for your area
+                            </div>
+                        </div>
+
+                        <!-- Main Crops -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                {{ get_text('crop_type') }}
+                            </label>
+                            <div class="form-text mb-3">
+                                Select the crops you primarily grow (choose 3-5 crops)
+                            </div>
+                            
+                            <div class="row g-2">
+                                {% for crop in crops_list %}
+                                <div class="col-6 col-sm-4 col-md-3">
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="checkbox" 
+                                            value="{{ crop }}" 
+                                            id="crop_{{ loop.index }}"
+                                            name="main_crops"
+                                        >
+                                        <label class="form-check-label" for="crop_{{ loop.index }}">
+                                            {{ crop }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                {{ get_text('save_profile') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Why we need this information
+                    </h4>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-start">
+                                <span class="text-primary me-3">🌤️</span>
+                                <div>
+                                    <strong>PIN Code:</strong> Get hyperlocal weather forecasts and alerts specific to your farming area
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start">
+                                <span class="text-success me-3">💰</span>
+                                <div>
+                                    <strong>Crops:</strong> Receive market prices and trends for crops you actually grow
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start">
+                                <span class="text-info me-3">🎯</span>
+                                <div>
+                                    <strong>Location:</strong> Connect with local agricultural resources and support
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// PIN code validation
+document.getElementById('pin_code').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 6) {
+        value = value.substring(0, 6);
+    }
+    e.target.value = value;
+});
+
+// Crop selection validation (minimum 1, maximum 8)
+document.addEventListener('DOMContentLoaded', function() {
+    const cropCheckboxes = document.querySelectorAll('input[name="main_crops"]');
+    const submitButton = document.querySelector('button[type="submit"]');
+    
+    function validateCropSelection() {
+        const selectedCrops = document.querySelectorAll('input[name="main_crops"]:checked');
+        const count = selectedCrops.length;
+        
+        if (count === 0) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Please select at least one crop';
+        } else if (count > 8) {
+            // Disable further selection
+            cropCheckboxes.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    checkbox.disabled = true;
+                }
+            });
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Complete Profile Setup (Max 8 selected)';
+        } else {
+            // Enable all checkboxes
+            cropCheckboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Complete Profile Setup (' + count + ' crops selected)';
+        }
+    }
+    
+    cropCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', validateCropSelection);
+    });
+    
+    // Initial validation
+    validateCropSelection();
+});
+
+// Auto-focus on first input
+window.addEventListener('load', function() {
+    document.getElementById('full_name').focus();
+});
+</script>
+{% endblock %}

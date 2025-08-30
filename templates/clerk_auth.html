@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Krishi Sahayak{% endblock %}
+
+{% block extra_head %}
+<style>
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.auth-body {
+    padding: 2rem;
+}
+
+.brand-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.brand-subtitle {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.features-list li {
+    padding: 0.5rem 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.features-list li::before {
+    content: "✓";
+    color: #2d5016;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+#clerk-signin {
+    margin-top: 1rem;
+}
+
+/* Clerk component styling */
+.cl-rootBox {
+    width: 100%;
+}
+
+.cl-card {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.cl-headerTitle {
+    color: #2d5016 !important;
+}
+
+.cl-socialButtonsBlockButton {
+    border-color: #e0e0e0 !important;
+}
+
+.cl-formButtonPrimary {
+    background-color: #2d5016 !important;
+}
+
+.cl-formButtonPrimary:hover {
+    background-color: #4a7c59 !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                <div class="card auth-card">
+                    <div class="auth-header">
+                        <div class="brand-title">🌱 Krishi Sahayak</div>
+                        <div class="brand-subtitle">The Farmer's AI Co-pilot</div>
+                    </div>
+                    <div class="auth-body">
+                        <h3 class="text-center mb-3" style="color: #2d5016;">Welcome Back!</h3>
+                        <p class="text-center text-muted mb-4">Sign in to access your farming dashboard</p>
+                        
+                        <ul class="features-list">
+                            <li>🔬 AI Plant Disease Detection</li>
+                            <li>🌤️ Real-time Weather Forecasts</li>
+                            <li>💰 Live Market Prices</li>
+                            <li>📜 Digital Crop Certificates</li>
+                        </ul>
+                        
+                        <div id="clerk-signin"></div>
+                        
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                🔒 Secure authentication powered by Clerk<br>
+                                Your data is safe and encrypted
+                            </small>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-success btn-sm">
+                                🏠 Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="{{ clerk_publishable_key }}"
+  src="https://informed-haddock-86.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+  type="text/javascript">
+</script>
+
+<script>
+window.addEventListener('load', async () => {
+    try {
+        await window.Clerk.load();
+
+        if (window.Clerk.user) {
+            // User is signed in, create session and redirect
+            const response = await fetch('/auth/session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    clerk_user_id: window.Clerk.user.id,
+                    email: window.Clerk.user.primaryEmailAddress?.emailAddress,
+                    phone: window.Clerk.user.primaryPhoneNumber?.phoneNumber
+                })
+            });
+            
+            const data = await response.json();
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        } else {
+            // Mount sign-in component with custom styling
+            window.Clerk.mountSignIn(document.getElementById('clerk-signin'), {
+                appearance: {
+                    theme: {
+                        primaryColor: '#2d5016',
+                        primaryColorText: '#ffffff'
+                    },
+                    elements: {
+                        card: 'shadow-none border-0',
+                        headerTitle: 'text-success',
+                        socialButtonsBlockButton: 'border-secondary',
+                        formButtonPrimary: 'bg-success border-success'
+                    }
+                },
+                afterSignInUrl: '/session',
+                afterSignUpUrl: '/session'
+            });
+        }
+    } catch (error) {
+        console.error('Clerk initialization error:', error);
+        document.getElementById('clerk-signin').innerHTML = `
+            <div class="alert alert-danger text-center">
+                <h5>🚧 Authentication Service Error</h5>
+                <p>Unable to load authentication. Please check your internet connection and try again.</p>
+                <button onclick="window.location.reload()" class="btn btn-success">Retry</button>
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %}

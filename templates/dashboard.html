@@ -1,0 +1,1113 @@
+{% extends "base.html" %}
+
+{% block title %}{{ get_text('dashboard') }} - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Language Selector -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-end">
+                <div class="dropdown">
+                    <button class="btn btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        🌐 {{ get_text('change_language') }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for lang in available_languages %}
+                        <li>
+                            <a class="dropdown-item {{ 'active' if current_lang == lang.code else '' }}" 
+                               href="{{ url_for('set_language', lang_code=lang.code) }}">
+                                {{ lang.native }} ({{ lang.name }})
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card welcome-card" data-animation="fadeInUp" data-delay="100">
+                <div class="card-body text-center">
+                    <div class="welcome-animation">
+                        <div class="farmer-avatar">👨‍🌾</div>
+                        <div class="crop-icons">
+                            <span class="crop-icon">🌱</span>
+                            <span class="crop-icon">🌿</span>
+                            <span class="crop-icon">🌾</span>
+                        </div>
+                    </div>
+                    <h1 class="h2 mb-3 welcome-text">🌾 {{ get_text('welcome') }}, {{ (user.name or user.full_name or 'Farmer').split()[0] }}!</h1>
+                    <p class="text-muted mb-0 location-info">
+                        📍 {{ user.place or user.village_city or 'Unknown Location' }} ({{ user.pincode or user.pin_code or '000000' }}) 
+                        | 🌱 {{ get_text('scan_plant') }}
+                    </p>
+                    <div class="farming-stats mt-3">
+                        <div class="stat-item">
+                            <div class="stat-number" data-morph="number">25</div>
+                            <div class="stat-label">Days Active</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-morph="number">12</div>
+                            <div class="stat-label">Scans Done</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-morph="number">8</div>
+                            <div class="stat-label">Crops Monitored</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weather Widget -->
+    {% if weather %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="weather-widget" id="dashboardWeatherWidget" data-weather="{{ weather.current.description.lower() }}">
+                <!-- Weather Animation Background -->
+                <div class="weather-animation-bg">
+                    <!-- Rain Animation -->
+                    <div class="rain-container" style="display: none;">
+                        {% for i in range(30) %}
+                        <div class="rain-drop" style="left: {{ (i * 3.33) % 100 }}%; animation-delay: {{ (i * 0.1) % 2 }}s;"></div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Cloud Animation -->
+                    <div class="clouds-container" style="display: none;">
+                        <div class="cloud cloud1">☁️</div>
+                        <div class="cloud cloud2">☁️</div>
+                    </div>
+                    
+                    <!-- Sun Animation -->
+                    <div class="sun-container" style="display: none;">
+                        <div class="sun">☀️</div>
+                    </div>
+                    
+                    <!-- Mist Animation -->
+                    <div class="mist-container" style="display: none;">
+                        <div class="mist-layer mist1"></div>
+                        <div class="mist-layer mist2"></div>
+                    </div>
+                </div>
+                <div class="row" style="position: relative; z-index: 2;">
+                    <div class="col-12 col-md-4">
+                        <div class="weather-current">
+                            <h3 class="h4 mb-2">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                </svg>
+                                {{ get_text('weather_today') }} - {{ weather.city }}
+                            </h3>
+                            <div class="weather-temp">{{ weather.current.temperature }}°C</div>
+                            <div class="weather-description">{{ weather.current.description }}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8">
+                        <div class="weather-details">
+                            <div class="weather-detail">
+                                <div class="h5">{{ weather.current.humidity }}%</div>
+                                <small>{{ get_text('humidity') }}</small>
+                            </div>
+                            <div class="weather-detail">
+                                <div class="h5">{{ weather.current.wind_speed }} km/h</div>
+                                <small>{{ get_text('wind_speed') }}</small>
+                            </div>
+                            <div class="weather-detail">
+                                <div class="h5">{{ weather.current.pressure }} hPa</div>
+                                <small>{{ get_text('temperature') }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if weather.forecast %}
+                <div class="weather-forecast">
+                    {% for day in weather.forecast %}
+                    <div class="forecast-day">
+                        <h4>{{ day.day_name[:3] }}</h4>
+                        <div class="mb-2">{{ day.high_temp }}° / {{ day.low_temp }}°</div>
+                        <small>{{ day.description }}</small>
+                        <div class="mt-1">
+                            <small class="text-primary">🌧️ {{ day.rain_probability }}%</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% elif weather and weather.error %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h5>⚠️ Weather Service Unavailable</h5>
+                <p class="mb-0">{{ weather.error }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Price Alerts Section -->
+    {% if alerts and alerts|length > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert-section">
+                <h4 class="mb-3">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5V3h5v14z"></path>
+                    </svg>
+                    🚨 {{ get_text('price_alerts') }} ({{ alerts|length }})
+                </h4>
+                <div class="alerts-container">
+                    {% for alert in alerts %}
+                    <div class="alert-item alert-{{ alert.urgency }}">
+                        <div class="alert-content">
+                            <div class="alert-message">{{ alert.message }}</div>
+                            <div class="alert-meta">
+                                <span class="badge bg-{{ 'success' if alert.action == 'sell' else 'primary' if alert.action == 'buy' else 'secondary' }}">
+                                    {{ 'बेचें' if alert.action == 'sell' else 'खरीदें' if alert.action == 'buy' else 'निगरानी करें' }}
+                                </span>
+                                <small class="text-muted ms-2">{{ alert.timestamp[:16] }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if alert_summary %}
+                <div class="alert-summary mt-3">
+                    <p class="mb-0"><strong>सारांश:</strong> {{ alert_summary.summary }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+
+    <!-- Market Price Ticker -->
+    {% if market_data and market_data.prices %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="market-ticker">
+                <h4 class="mb-3">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    {{ get_text('market_prices') }}
+                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="refreshAlerts()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Refresh Alerts
+                    </button>
+                    <button class="btn btn-sm btn-warning ms-2" onclick="loadDemoAlerts()">
+                        🧪 Demo Alerts
+                    </button>
+                </h4>
+                <div class="ticker-content">
+                    {% for price in market_data.prices %}
+                    <div class="price-item">
+                        <strong>{{ price.crop }}:</strong>
+                        <span>₹{{ price.current_price }}</span>
+                        <span class="text-muted">{{ price.market }}</span>
+                    </div>
+                    {% endfor %}
+                    <!-- Duplicate items for seamless loop -->
+                    {% for price in market_data.prices %}
+                    <div class="price-item">
+                        <strong>{{ price.crop }}:</strong>
+                        <span>₹{{ price.current_price }}</span>
+                        <span class="text-muted">{{ price.market }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif market_data and market_data.error %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h5>⚠️ Market Data Unavailable</h5>
+                <p class="mb-0">{{ market_data.error }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                {{ get_text('quick_actions') }}
+            </h3>
+            <div class="quick-actions">
+                <!-- Plant Scanner -->
+                <a href="{{ url_for('scanner') }}" class="action-btn requires-online stagger-child" data-animation="bounceIn" data-delay="200">
+                    <div class="action-icon-container">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <div class="action-badge">AI</div>
+                    </div>
+                    <h3>{{ get_text('scan_plant') }}</h3>
+                    <p>{{ get_text('plant_disease_scanner') }}</p>
+                    <div class="action-stats">
+                        <span class="success-rate">{{ get_text('accuracy') }}</span>
+                    </div>
+                </a>
+
+                <!-- Full Market Prices -->
+                <a href="{{ url_for('market') }}" class="action-btn stagger-child" data-animation="bounceIn" data-delay="300">
+                    <div class="action-icon-container">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        <div class="action-badge trending">📈</div>
+                    </div>
+                    <h3>{{ get_text('market_prices') }}</h3>
+                    <p>{{ get_text('crop_prices') }}</p>
+                    <div class="action-stats">
+                        <span class="live-indicator">🔴 {{ get_text('live_prices') }}</span>
+                    </div>
+                </a>
+
+                <!-- Digital Passport -->
+                <a href="{{ url_for('passport') }}" class="action-btn stagger-child" data-animation="bounceIn" data-delay="400">
+                    <div class="action-icon-container">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <div class="action-badge blockchain">⛓️</div>
+                    </div>
+                    <h3>{{ get_text('digital_crop_passport') }}</h3>
+                    <p>{{ get_text('generate_qr') }}</p>
+                    <div class="action-stats">
+                        <span class="blockchain-indicator">🔐 {{ get_text('blockchain_secured') }}</span>
+                    </div>
+                </a>
+
+                <!-- Weather Shield -->
+                <a href="{{ url_for('weather_shield') }}" class="action-btn requires-online stagger-child" data-animation="bounceIn" data-delay="500">
+                    <div class="action-icon-container">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <div class="action-badge insurance">🛡️</div>
+                    </div>
+                    <h3>{{ get_text('weather_shield') }}</h3>
+                    <p>{{ get_text('parametric_weather_insurance') }}</p>
+                    <div class="action-stats">
+                        <span class="protection-indicator">⚡ {{ get_text('smart_protection') }}</span>
+                    </div>
+                </a>
+                
+                <!-- Yield Prediction -->
+                <a href="{{ url_for('yield_prediction') }}" class="action-btn stagger-child" data-animation="bounceIn" data-delay="600">
+                    <div class="action-icon-container">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <div class="action-badge prediction">🔮</div>
+                    </div>
+                    <h3>{{ get_text('yield_prediction') }}</h3>
+                    <p>{{ get_text('ai_powered_crop_yield') }}</p>
+                    <div class="action-stats">
+                        <span class="accuracy-indicator">🎯 85% {{ get_text('accurate') }}</span>
+                    </div>
+                </a>
+                
+                <!-- Resources -->
+                <a href="#" class="action-btn stagger-child" data-animation="bounceIn" data-delay="700" onclick="toggleResources()">
+                    <div class="action-icon-container">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <div class="action-badge resources">📚</div>
+                    </div>
+                    <h3>{{ get_text('resources') }}</h3>
+                    <p>{{ get_text('farming_guides_tutorials') }}</p>
+                    <div class="action-stats">
+                        <span class="resource-count">📖 {{ get_text('guides') }}</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farming Tips Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    Today's Farming Tip
+                </div>
+                <div class="card-body">
+                    {% if weather and weather.forecast %}
+                        {% set next_day = weather.forecast[1] if weather.forecast|length > 1 else weather.forecast[0] %}
+                        {% if next_day.rain_probability > 70 %}
+                            <div class="alert alert-warning">
+                                <strong>⚠️ Heavy Rain Expected:</strong> 
+                                {{ next_day.rain_probability }}% chance of rain on {{ next_day.day_name }}. 
+                                Avoid spraying pesticides or fertilizers today.
+                            </div>
+                        {% elif weather.current.temperature > 35 %}
+                            <div class="alert alert-info">
+                                <strong>🌡️ Hot Weather Alert:</strong> 
+                                Temperature is {{ weather.current.temperature }}°C. 
+                                Water your crops early morning or late evening to prevent water loss.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success">
+                                <strong>✅ Good Farming Weather:</strong> 
+                                Current conditions ({{ weather.current.temperature }}°C, {{ weather.current.description }}) 
+                                are favorable for most farming activities.
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="mb-0">
+                            <strong>💡 Daily Tip:</strong> Check your crops regularly for early signs of disease or pest problems. 
+                            Early detection can save your entire harvest!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ get_text('getting_started') }}
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
+                                <h4>{{ get_text('step_1') }}</h4>
+                                <p class="text-muted">{{ get_text('take_photo_diseased_plant') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-primary">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                    </svg>
+                                </div>
+                                <h4>{{ get_text('step_2') }}</h4>
+                                <p class="text-muted">{{ get_text('check_weather_before_planning') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <h4>{{ get_text('step_3') }}</h4>
+                                <p class="text-muted">{{ get_text('monitor_market_prices') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Assistant - Prominent Position -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ai-assistant-prominent">
+                <div class="assistant-header">
+                    <h3 class="mb-2">
+                        🗣️ आपका AI सहायक (Your AI Assistant)
+                    </h3>
+                    <p class="mb-3">बोलकर अपनी खेती की समस्या पूछें - हिंदी या अंग्रेजी में!</p>
+                </div>
+                
+                <div class="assistant-controls">
+                    <button id="voice-button" class="btn btn-success btn-lg voice-btn-prominent me-3" onclick="startVoiceInput()">
+                        <span id="voice-icon">🗣️</span>
+                        <span id="voice-text">बोलिए</span>
+                    </button>
+                    
+                    <button id="language-toggle" class="btn btn-outline-success" onclick="toggleLanguage()">हिं</button>
+                </div>
+                
+                <!-- Animations -->
+                <div id="listening-animation" class="listening-wave mt-3" style="display: none;">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+                
+                <div id="processing-animation" class="processing-spinner mt-3" style="display: none;">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <span class="ms-2">AI विश्लेषण कर रहा है...</span>
+                </div>
+                
+                <!-- Voice Response -->
+                <div id="voice-response" class="voice-response mt-4" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Resources Section -->
+<div id="resourcesSection" class="resources-section" style="display: none;">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>📚 Farming Resources</h4>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleResources()">✕ Close</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h6>📖 Guides</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="window.open('https://agricoop.nic.in/sites/default/files/Rice%20Production%20Guidelines.pdf')">Rice Guide</button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="window.open('https://agricoop.nic.in/sites/default/files/Wheat%20Production%20Guidelines.pdf')">Wheat Guide</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>🎥 Videos</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-success btn-sm" onclick="window.open('https://youtube.com/results?search_query=pest+control+farming')">Pest Control</button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="window.open('https://youtube.com/results?search_query=irrigation+farming')">Irrigation</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>🏛️ Schemes</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-warning btn-sm" onclick="window.open('https://pmkisan.gov.in')">PM-KISAN</button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="window.open('https://pmfby.gov.in')">Crop Insurance</button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6>🧮 {{ get_text('calculate') }}</h6>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('seed_calculator_page') }}" class="btn btn-outline-info btn-sm">🌱 {{ get_text('seed_calculator') }}</a>
+                                    <a href="{{ url_for('resource_optimizer_page') }}" class="btn btn-outline-info btn-sm">💧 {{ get_text('resource_optimizer') }}</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🚨 {{ get_text('info') }}</h6>
+                                <div class="d-grid gap-2">
+                                    <a href="tel:1800-180-1551" class="btn btn-outline-danger btn-sm">{{ get_text('info') }}</a>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="KrishiLang.showNotification('weather_alerts_coming')">{{ get_text('weather') }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.resource-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    height: 100%;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.resource-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.resource-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.resource-links .btn {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+<style>
+.voice-btn {
+    border-radius: 50px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.voice-btn.listening {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.listening-wave {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wave {
+    width: 10px;
+    height: 30px;
+    background: #007bff;
+    margin: 0 2px;
+    border-radius: 5px;
+    animation: wave 1.2s infinite ease-in-out;
+}
+
+.wave:nth-child(2) { animation-delay: -1.1s; }
+.wave:nth-child(3) { animation-delay: -1.0s; }
+
+@keyframes wave {
+    0%, 40%, 100% { transform: scaleY(0.4); }
+    20% { transform: scaleY(1.0); }
+}
+
+.voice-response {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid #007bff;
+    text-align: left;
+}
+
+.processing-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Prominent AI Assistant Styles */
+.ai-assistant-prominent {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-assistant-prominent::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+.assistant-header h3 {
+    color: white;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.assistant-header p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.assistant-controls {
+    position: relative;
+    z-index: 2;
+}
+
+.voice-btn-prominent {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 15px 35px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.voice-btn-prominent:hover {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.voice-btn-prominent.listening {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    border-color: #ff6b6b;
+    animation: pulse-prominent 1.5s infinite;
+}
+
+@keyframes pulse-prominent {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
+.listening-wave {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.wave {
+    width: 12px;
+    height: 40px;
+    background: rgba(255,255,255,0.8);
+    margin: 0 3px;
+    border-radius: 6px;
+    animation: wave 1.2s infinite ease-in-out;
+}
+
+.wave:nth-child(2) { animation-delay: -1.1s; }
+.wave:nth-child(3) { animation-delay: -1.0s; }
+
+@keyframes wave {
+    0%, 40%, 100% { transform: scaleY(0.4); }
+    20% { transform: scaleY(1.0); }
+}
+
+.voice-response {
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    padding: 20px;
+    border-left: 4px solid var(--primary-green);
+    text-align: left;
+    color: var(--primary-green);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .ai-assistant-prominent {
+        padding: 20px;
+        border-radius: 15px;
+    }
+    
+    .assistant-header h3 {
+        font-size: 1.3rem;
+    }
+    
+    .assistant-header p {
+        font-size: 1rem;
+    }
+    
+    .voice-btn-prominent {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Alert Styles */
+.alert-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.alert-section h4 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert-item {
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+}
+
+.alert-item:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+}
+
+.alert-item.alert-high {
+    border-left: 4px solid #ff6b6b;
+    animation: pulse-alert 2s infinite;
+}
+
+.alert-item.alert-medium {
+    border-left: 4px solid #feca57;
+}
+
+.alert-item.alert-low {
+    border-left: 4px solid #48dbfb;
+}
+
+@keyframes pulse-alert {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
+.alert-message {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.alert-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.alert-summary {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+@media (max-width: 768px) {
+    .alert-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+
+</style>
+
+<script src="{{ url_for('static', filename='js/multilingual.js') }}"></script>
+<script src="{{ url_for('static', filename='js/enhanced-voice-assistant.js') }}"></script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-refresh market ticker and weather data
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation delay to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('fade-in');
+        }, index * 100);
+    });
+
+    // Market ticker animation control
+    const ticker = document.querySelector('.ticker-content');
+    if (ticker) {
+        ticker.addEventListener('mouseenter', function() {
+            this.style.animationPlayState = 'paused';
+        });
+        
+        ticker.addEventListener('mouseleave', function() {
+            this.style.animationPlayState = 'running';
+        });
+    }
+});
+
+// Weather-based notifications
+{% if weather %}
+    {% if weather.forecast and weather.forecast[0].rain_probability > 80 %}
+        setTimeout(() => {
+            showNotification('🌧️ Heavy rain expected today! Avoid outdoor farming activities.', 'warning');
+        }, 2000);
+    {% endif %}
+{% endif %}
+
+// Alert functions
+function refreshAlerts() {
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Loading...';
+    button.disabled = true;
+    
+    fetch('/api/alerts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.alerts.length > 0) {
+                updateAlertsDisplay(data.alerts, data.summary);
+                showNotification(`${data.alerts.length} new alerts found!`, 'success');
+            } else {
+                showNotification('No new alerts at this time.', 'info');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching alerts:', error);
+            showNotification('Error fetching alerts. Please try again.', 'error');
+        })
+        .finally(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+}
+
+function updateAlertsDisplay(alerts, summary) {
+    const alertsContainer = document.querySelector('.alerts-container');
+    if (!alertsContainer) return;
+    
+    alertsContainer.innerHTML = '';
+    
+    alerts.forEach(alert => {
+        const alertElement = document.createElement('div');
+        alertElement.className = `alert-item alert-${alert.urgency}`;
+        
+        const actionText = alert.action === 'sell' ? 'बेचें' : 
+                          alert.action === 'buy' ? 'खरीदें' : 'निगरानी करें';
+        const badgeClass = alert.action === 'sell' ? 'success' : 
+                          alert.action === 'buy' ? 'primary' : 'secondary';
+        
+        alertElement.innerHTML = `
+            <div class="alert-content">
+                <div class="alert-message">${alert.message}</div>
+                <div class="alert-meta">
+                    <span class="badge bg-${badgeClass}">${actionText}</span>
+                    <small class="text-muted ms-2">${alert.timestamp.substring(0, 16)}</small>
+                </div>
+            </div>
+        `;
+        
+        alertsContainer.appendChild(alertElement);
+    });
+    
+    // Update summary
+    const summaryElement = document.querySelector('.alert-summary p');
+    if (summaryElement && summary) {
+        summaryElement.innerHTML = `<strong>सारांश:</strong> ${summary.summary}`;
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+// Demo alerts function
+function loadDemoAlerts() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Loading...';
+    button.disabled = true;
+    
+    fetch('/api/demo-alerts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Create or update alerts section
+                let alertSection = document.querySelector('.alert-section');
+                if (!alertSection) {
+                    // Create new alert section if it doesn't exist
+                    const marketSection = document.querySelector('.market-ticker').closest('.row');
+                    const newRow = document.createElement('div');
+                    newRow.className = 'row mb-4';
+                    newRow.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert-section">
+                                <h4 class="mb-3">
+                                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5V3h5v14z"></path>
+                                    </svg>
+                                    🚨 Price Alerts (${data.alerts.length})
+                                </h4>
+                                <div class="alerts-container"></div>
+                                <div class="alert-summary mt-3">
+                                    <p class="mb-0"><strong>सारांश:</strong> ${data.summary.summary}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    marketSection.parentNode.insertBefore(newRow, marketSection);
+                }
+                
+                updateAlertsDisplay(data.alerts, data.summary);
+                showNotification(`${data.alerts.length} demo alerts loaded!`, 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading demo alerts:', error);
+            showNotification('Error loading demo alerts.', 'error');
+        })
+        .finally(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+}
+
+
+
+
+
+// Simple Resources Toggle
+function toggleResources() {
+    const section = document.getElementById('resourcesSection');
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        // Scroll to bottom of page where resources section is
+        setTimeout(() => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }, 100);
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+function seedCalc() {
+    const area = prompt('Enter farm area in acres:');
+    if (area && !isNaN(area)) {
+        alert(`Seed needed:\nRice: ${area * 25} kg\nWheat: ${area * 40} kg\nCotton: ${area * 1.5} kg`);
+    }
+}
+
+
+
+// Auto-refresh alerts every 5 minutes
+setInterval(() => {
+    fetch('/api/alerts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.alerts.length > 0) {
+                updateAlertsDisplay(data.alerts, data.summary);
+            }
+        })
+        .catch(error => console.log('Background alert refresh failed:', error));
+}, 300000); // 5 minutes
+
+// Dashboard Weather Animation Controller
+function initDashboardWeatherAnimations() {
+    const weatherWidget = document.getElementById('dashboardWeatherWidget');
+    if (!weatherWidget) return;
+    
+    const weatherCondition = weatherWidget.getAttribute('data-weather') || '';
+    const condition = weatherCondition.toLowerCase();
+    
+    console.log('Dashboard weather condition:', condition);
+    
+    // Hide all animations first
+    const animations = ['.rain-container', '.clouds-container', '.sun-container', '.mist-container'];
+    animations.forEach(selector => {
+        const element = weatherWidget.querySelector(selector);
+        if (element) element.style.display = 'none';
+    });
+    
+    // Show appropriate animation
+    if (condition.includes('rain') || condition.includes('drizzle') || condition.includes('shower') || condition.includes('precipitation')) {
+        showDashboardAnimation('.rain-container');
+    } else if (condition.includes('cloud') || condition.includes('overcast')) {
+        showDashboardAnimation('.clouds-container');
+    } else if (condition.includes('clear') || condition.includes('sunny') || condition.includes('sun')) {
+        showDashboardAnimation('.sun-container');
+    } else if (condition.includes('mist') || condition.includes('fog') || condition.includes('haze')) {
+        showDashboardAnimation('.mist-container');
+    } else {
+        showDashboardAnimation('.clouds-container');
+    }
+    
+    function showDashboardAnimation(selector) {
+        const element = weatherWidget.querySelector(selector);
+        if (element) {
+            element.style.display = 'block';
+        }
+    }
+}
+
+
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">🌱 Welcome to Krishi Sahayak</h2>
+                    <p class="text-center text-muted mb-4">Sign in to access your farming dashboard</p>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-muted">New user? Profile setup will follow after sign in.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

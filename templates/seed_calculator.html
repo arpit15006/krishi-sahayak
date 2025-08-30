@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block title %}Seed Calculator - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="mb-3">🌱 {{ get_text('seed_calculator') }}</h1>
+                <p class="lead">{{ get_text('calculate') }} {{ get_text('seed_required') }} {{ get_text('farm_area') }}</p>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>📊 {{ get_text('calculate') }} {{ get_text('seed_required') }}</h3>
+                </div>
+                <div class="card-body">
+                    <form id="seedCalculatorForm">
+                        <div class="row">
+                            <!-- Crop Selection -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🌾 {{ get_text('crop_type') }}</label>
+                                <select class="form-select" id="cropType" required>
+                                    <option value="">{{ get_text('crop_type') }}</option>
+                                    <option value="rice">धान (Rice)</option>
+                                    <option value="wheat">गेहूं (Wheat)</option>
+                                    <option value="maize">मक्का (Maize)</option>
+                                    <option value="cotton">कपास (Cotton)</option>
+                                    <option value="sugarcane">गन्ना (Sugarcane)</option>
+                                    <option value="soybean">सोयाबीन (Soybean)</option>
+                                    <option value="groundnut">मूंगफली (Groundnut)</option>
+                                    <option value="sunflower">सूरजमुखी (Sunflower)</option>
+                                    <option value="mustard">सरसों (Mustard)</option>
+                                    <option value="chickpea">चना (Chickpea)</option>
+                                    <option value="pigeon_pea">अरहर (Pigeon Pea)</option>
+                                    <option value="black_gram">उड़द (Black Gram)</option>
+                                    <option value="green_gram">मूंग (Green Gram)</option>
+                                    <option value="onion">प्याज (Onion)</option>
+                                    <option value="tomato">टमाटर (Tomato)</option>
+                                    <option value="potato">आलू (Potato)</option>
+                                    <option value="cabbage">पत्तागोभी (Cabbage)</option>
+                                    <option value="cauliflower">फूलगोभी (Cauliflower)</option>
+                                </select>
+                            </div>
+
+                            <!-- Variety Selection -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🌿 {{ get_text('variety') }}</label>
+                                <select class="form-select" id="variety">
+                                    <option value="standard">मानक किस्म</option>
+                                    <option value="hybrid">हाइब्रिड</option>
+                                    <option value="high_yield">उच्च उत्पादन</option>
+                                    <option value="drought_resistant">सूखा प्रतिरोधी</option>
+                                </select>
+                            </div>
+
+                            <!-- Farm Area -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">📏 {{ get_text('farm_area') }}</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="farmArea" step="0.1" min="0.1" required>
+                                    <select class="form-select" id="areaUnit" style="max-width: 120px;">
+                                        <option value="acre">{{ get_text('acres') }}</option>
+                                        <option value="hectare">{{ get_text('hectares') }}</option>
+                                        <option value="bigha">{{ get_text('bigha') }}</option>
+                                        <option value="katha">{{ get_text('katha') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Sowing Method -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🚜 {{ get_text('sowing_method') }}</label>
+                                <select class="form-select" id="sowingMethod">
+                                    <option value="broadcasting">{{ get_text('broadcasting') }}</option>
+                                    <option value="line_sowing">{{ get_text('line_sowing') }}</option>
+                                    <option value="transplanting">{{ get_text('transplanting') }}</option>
+                                    <option value="dibbling">{{ get_text('dibbling') }}</option>
+                                </select>
+                            </div>
+
+                            <!-- Soil Type -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🏔️ {{ get_text('soil_type') }}</label>
+                                <select class="form-select" id="soilType">
+                                    <option value="clay">चिकनी मिट्टी</option>
+                                    <option value="loam">दोमट मिट्टी</option>
+                                    <option value="sandy">बलुई मिट्टी</option>
+                                    <option value="black">काली मिट्टी</option>
+                                    <option value="red">लाल मिट्टी</option>
+                                </select>
+                            </div>
+
+                            <!-- Season -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🌤️ {{ get_text('season') }}</label>
+                                <select class="form-select" id="season">
+                                    <option value="kharif">{{ get_text('kharif') }}</option>
+                                    <option value="rabi">{{ get_text('rabi') }}</option>
+                                    <option value="zaid">{{ get_text('summer') }}</option>
+                                    <option value="year_round">{{ get_text('season') }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                🧮 {{ get_text('calculate') }} {{ get_text('seed_required') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="calculationResults" class="card" style="display: none;">
+                <div class="card-header">
+                    <h3>📋 गणना परिणाम</h3>
+                </div>
+                <div class="card-body">
+                    <div id="resultsContent"></div>
+                </div>
+            </div>
+
+            <!-- Seed Information Cards -->
+            <div class="row" id="seedInfoCards" style="display: none;">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5>💰 लागत विश्लेषण</h5>
+                        </div>
+                        <div class="card-body" id="costAnalysis">
+                            <!-- Cost details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5>📅 बुवाई की जानकारी</h5>
+                        </div>
+                        <div class="card-body" id="sowingInfo">
+                            <!-- Sowing information will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5>💡 सुझाव</h5>
+                        </div>
+                        <div class="card-body" id="recommendations">
+                            <!-- Recommendations will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seed Rate Reference Table -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>📚 बीज दर संदर्भ तालिका</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>फसल</th>
+                                    <th>बीज दर (किग्रा/एकड़)</th>
+                                    <th>बुवाई विधि</th>
+                                    <th>मौसम</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>धान</td><td>8-10</td><td>रोपाई</td><td>खरीफ</td></tr>
+                                <tr><td>गेहूं</td><td>40-50</td><td>कतार में</td><td>रबी</td></tr>
+                                <tr><td>मक्का</td><td>8-10</td><td>कतार में</td><td>खरीफ/रबी</td></tr>
+                                <tr><td>कपास</td><td>1-1.5</td><td>कतार में</td><td>खरीफ</td></tr>
+                                <tr><td>सोयाबीन</td><td>30-35</td><td>कतार में</td><td>खरीफ</td></tr>
+                                <tr><td>मूंगफली</td><td>40-50</td><td>कतार में</td><td>खरीफ/रबी</td></tr>
+                                <tr><td>सूरजमुखी</td><td>2.5-3</td><td>कतार में</td><td>रबी/जायद</td></tr>
+                                <tr><td>सरसों</td><td>2-3</td><td>छिड़काव</td><td>रबी</td></tr>
+                                <tr><td>चना</td><td>30-40</td><td>कतार में</td><td>रबी</td></tr>
+                                <tr><td>अरहर</td><td>8-10</td><td>कतार में</td><td>खरीफ</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>💡 बीज बुवाई के सुझाव</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>🌱 बीज चयन</h5>
+                            <ul>
+                                <li>प्रमाणित बीज का ही उपयोग करें</li>
+                                <li>बीज की अंकुरण क्षमता जांच लें</li>
+                                <li>स्थानीय जलवायु के अनुकूल किस्म चुनें</li>
+                                <li>रोग प्रतिरोधी किस्म को प्राथमिकता दें</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>🚜 बुवाई तकनीक</h5>
+                            <ul>
+                                <li>उचित गहराई पर बीज बोएं</li>
+                                <li>कतारों के बीच सही दूरी रखें</li>
+                                <li>मिट्टी में पर्याप्त नमी सुनिश्चित करें</li>
+                                <li>बुवाई के बाद हल्की सिंचाई करें</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('seedCalculatorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    calculateSeedRequirement();
+});
+
+async function calculateSeedRequirement() {
+    const formData = {
+        crop_type: document.getElementById('cropType').value,
+        variety: document.getElementById('variety').value,
+        farm_area: parseFloat(document.getElementById('farmArea').value),
+        area_unit: document.getElementById('areaUnit').value,
+        sowing_method: document.getElementById('sowingMethod').value,
+        soil_type: document.getElementById('soilType').value,
+        season: document.getElementById('season').value
+    };
+
+    if (!formData.crop_type || !formData.farm_area) {
+        alert('कृपया सभी आवश्यक फील्ड भरें');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/calculate-seed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            displayResults(result.calculation);
+        } else {
+            alert('गणना में त्रुटि: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('कुछ तकनीकी समस्या है। कृपया दोबारा कोशिश करें।');
+    }
+}
+
+function displayResults(calculation) {
+    const resultsDiv = document.getElementById('calculationResults');
+    const resultsContent = document.getElementById('resultsContent');
+    const seedInfoCards = document.getElementById('seedInfoCards');
+
+    // Main results
+    resultsContent.innerHTML = `
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div class="bg-success text-white p-3 rounded">
+                    <h4>${calculation.seed_required} किग्रा</h4>
+                    <p class="mb-0">कुल बीज की आवश्यकता</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-info text-white p-3 rounded">
+                    <h4>${calculation.seed_rate} किग्रा/एकड़</h4>
+                    <p class="mb-0">बीज दर</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-warning text-white p-3 rounded">
+                    <h4>${calculation.area_in_acres} एकड़</h4>
+                    <p class="mb-0">कुल क्षेत्रफल</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h5>📊 विस्तृत जानकारी:</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>फसल:</strong> ${getCropName(calculation.crop_type)}</p>
+                    <p><strong>किस्म:</strong> ${getVarietyName(calculation.variety)}</p>
+                    <p><strong>बुवाई विधि:</strong> ${getSowingMethodName(calculation.sowing_method)}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>मौसम:</strong> ${getSeasonName(calculation.season)}</p>
+                    <p><strong>मिट्टी:</strong> ${getSoilTypeName(calculation.soil_type)}</p>
+                    <p><strong>अतिरिक्त बीज (10%):</strong> ${calculation.extra_seed} किग्रा</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Cost analysis
+    document.getElementById('costAnalysis').innerHTML = `
+        <p><strong>अनुमानित लागत:</strong></p>
+        <ul>
+            <li>बीज लागत: ₹${calculation.cost_analysis.seed_cost}</li>
+            <li>बुवाई लागत: ₹${calculation.cost_analysis.sowing_cost}</li>
+            <li>कुल लागत: ₹${calculation.cost_analysis.total_cost}</li>
+        </ul>
+        <p class="text-muted small">*कीमतें अनुमानित हैं और बाजार के अनुसार बदल सकती हैं</p>
+    `;
+
+    // Sowing information
+    document.getElementById('sowingInfo').innerHTML = `
+        <p><strong>बुवाई की गहराई:</strong> ${calculation.sowing_info.depth}</p>
+        <p><strong>कतारों की दूरी:</strong> ${calculation.sowing_info.row_spacing}</p>
+        <p><strong>पौधों की दूरी:</strong> ${calculation.sowing_info.plant_spacing}</p>
+        <p><strong>बुवाई का समय:</strong> ${calculation.sowing_info.best_time}</p>
+    `;
+
+    // Recommendations
+    document.getElementById('recommendations').innerHTML = `
+        <ul>
+            ${calculation.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+        </ul>
+    `;
+
+    resultsDiv.style.display = 'block';
+    seedInfoCards.style.display = 'flex';
+    
+    // Scroll to results
+    resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function getCropName(crop) {
+    const crops = {
+        'rice': 'धान',
+        'wheat': 'गेहूं',
+        'maize': 'मक्का',
+        'cotton': 'कपास',
+        'sugarcane': 'गन्ना',
+        'soybean': 'सोयाबीन',
+        'groundnut': 'मूंगफली',
+        'sunflower': 'सूरजमुखी',
+        'mustard': 'सरसों',
+        'chickpea': 'चना',
+        'pigeon_pea': 'अरहर',
+        'black_gram': 'उड़द',
+        'green_gram': 'मूंग',
+        'onion': 'प्याज',
+        'tomato': 'टमाटर',
+        'potato': 'आलू',
+        'cabbage': 'पत्तागोभी',
+        'cauliflower': 'फूलगोभी'
+    };
+    return crops[crop] || crop;
+}
+
+function getVarietyName(variety) {
+    const varieties = {
+        'standard': 'मानक किस्म',
+        'hybrid': 'हाइब्रिड',
+        'high_yield': 'उच्च उत्पादन',
+        'drought_resistant': 'सूखा प्रतिरोधी'
+    };
+    return varieties[variety] || variety;
+}
+
+function getSowingMethodName(method) {
+    const methods = {
+        'broadcasting': 'छिड़काव विधि',
+        'line_sowing': 'कतार में बुवाई',
+        'transplanting': 'रोपाई',
+        'dibbling': 'गड्ढा विधि'
+    };
+    return methods[method] || method;
+}
+
+function getSeasonName(season) {
+    const seasons = {
+        'kharif': 'खरीफ',
+        'rabi': 'रबी',
+        'zaid': 'जायद',
+        'year_round': 'साल भर'
+    };
+    return seasons[season] || season;
+}
+
+function getSoilTypeName(soil) {
+    const soils = {
+        'clay': 'चिकनी मिट्टी',
+        'loam': 'दोमट मिट्टी',
+        'sandy': 'बलुई मिट्टी',
+        'black': 'काली मिट्टी',
+        'red': 'लाल मिट्टी'
+    };
+    return soils[soil] || soil;
+}
+</script>
+{% endblock %}

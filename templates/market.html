@@ -1,0 +1,915 @@
+{% extends "base.html" %}
+
+{% block title %}{{ get_text('market') }} - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="h2 mb-3">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            {{ get_text('market_prices') }}
+        </h1>
+        <p class="lead text-muted">
+            {{ get_text('crop_prices') }}
+        </p>
+        <div class="text-muted">
+            <small>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Last updated: {{ market_data.last_updated if market_data else 'Just now' }}
+            </small>
+        </div>
+    </div>
+
+    {% if market_data and market_data.prices %}
+    <!-- Market Overview Cards -->
+    <div class="row g-4 mb-5">
+        {% for price in market_data.prices %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card price-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h3 class="h4 mb-0">{{ price.crop }}</h3>
+                        <span class="badge bg-primary rounded-pill">
+                            Live Price
+                        </span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <div class="text-center">
+                                <div class="h2 mb-1 text-primary">₹{{ price.current_price }}</div>
+                                <small class="text-muted">{{ price.unit }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <div class="h6 mb-1">Market</div>
+                            <div class="text-muted">{{ price.market }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            {{ price.market }}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <div class="card-footer bg-transparent">
+                    <div class="alert alert-info mb-2 py-2">
+                        <small><strong>📊 Real market data from AGMARKNET</strong></small>
+                    </div>
+                    
+                    <button class="btn btn-outline-primary btn-sm w-100" onclick="showPriceHistory('{{ price.crop }}')">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        {{ get_text('price_trend') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- No Data State -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-muted mb-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3>Market Data Unavailable</h3>
+                    <p class="text-muted mb-4">
+                        Unable to load market prices at the moment. Please check your internet connection and try again.
+                    </p>
+                    <button class="btn btn-primary" onclick="window.location.reload()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Retry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- AI Market Guru Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="market-guru-section">
+                <h4 class="mb-3">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    🔮 AI Market Guru - Predictive Advisory
+                    <button class="btn btn-sm btn-outline-light ms-2" onclick="refreshInsights()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Refresh
+                    </button>
+                </h4>
+                <div class="insights-container">
+                    {% if market_insights and market_insights|length > 0 %}
+                        {% for insight in market_insights %}
+                        <div class="insight-card insight-{{ insight.trend.lower() }}">
+                            <!-- Crop Header with Icon -->
+                            <div class="crop-header">
+                                <div class="crop-icon">
+                                    {% if insight.crop == 'Rice' %}🌾
+                                    {% elif insight.crop == 'Wheat' %}🌾
+                                    {% elif insight.crop == 'Cotton' %}🌿
+                                    {% elif insight.crop == 'Onion' %}🧅
+                                    {% elif insight.crop == 'Potato' %}🥔
+                                    {% elif insight.crop == 'Tomato' %}🍅
+                                    {% else %}🌱{% endif %}
+                                </div>
+                                <h4 class="crop-name">{{ insight.crop }}</h4>
+                                <div class="trend-indicator">
+                                    {% if insight.trend == 'UP' %}
+                                        <span class="trend-arrow up">↗️</span>
+                                    {% elif insight.trend == 'DOWN' %}
+                                        <span class="trend-arrow down">↘️</span>
+                                    {% else %}
+                                        <span class="trend-arrow stable">→</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Price Analysis Section -->
+                            <div class="price-analysis">
+                                <div class="price-row">
+                                    <div class="price-label">Current Price</div>
+                                    <div class="price-value current">₹{{ insight.current_price }}</div>
+                                </div>
+                                <div class="price-row">
+                                    <div class="price-label">Predicted Price</div>
+                                    <div class="price-value predicted">₹{{ insight.predicted_price }}</div>
+                                </div>
+                                <div class="price-change">
+                                    <span class="change-badge change-{{ insight.trend.lower() }}">
+                                        {% if insight.trend == 'UP' %}+{% elif insight.trend == 'DOWN' %}-{% endif %}{{ insight.percentage_change|abs }}%
+                                    </span>
+                                    <span class="confidence-tag">{{ insight.confidence }} Confidence</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Recommendation -->
+                            <div class="action-section">
+                                <div class="action-header">
+                                    <span class="action-icon">
+                                        {% if insight.action == 'HOLD' %}🤝
+                                        {% elif insight.action == 'SELL' %}💰
+                                        {% elif insight.action == 'WAIT' %}⏳
+                                        {% else %}📊{% endif %}
+                                    </span>
+                                    <span class="action-text">{{ insight.action }}</span>
+                                </div>
+                                <div class="advice-box">
+                                    {{ insight.advice }}
+                                </div>
+                            </div>
+
+                            <!-- Market Intelligence -->
+                            <div class="intelligence-footer">
+                                <div class="reason-text">
+                                    <strong>📊 Analysis:</strong> {{ insight.reason[:80] }}{% if insight.reason|length > 80 %}...{% endif %}
+                                </div>
+                                <div class="timeframe-tag">
+                                    <span class="time-icon">⏰</span> {{ insight.timeframe }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="alert alert-info mb-3">
+                                <strong>🔮 AI Market Analysis Ready</strong><br>
+                                Click the button below to get real-time market predictions powered by AI for your crops.
+                            </div>
+                            <button class="btn btn-success btn-lg mt-2" onclick="refreshInsights()">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                                🔄 Load Market Predictions
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Tips -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    Market Intelligence Tips
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <h4>Best Selling Time</h4>
+                                <p class="text-muted">
+                                    Sell when prices are 10% or more above average. Green arrows (▲) indicate good selling opportunities.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h4>Market Timing</h4>
+                                <p class="text-muted">
+                                    Prices often rise during festivals and peak consumption seasons. Plan your harvest accordingly.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
+                                <h4>Multiple Markets</h4>
+                                <p class="text-muted">
+                                    Check prices in nearby markets. Sometimes traveling 20km can increase your profits by 15-20%.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Price History Modal -->
+<div class="modal fade" id="priceHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span id="cropName">Crop</span> Price Trends
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="priceChart" class="text-center py-5">
+                    <div class="text-muted">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <p>Historical price data will be displayed here in the full version.</p>
+                        <div class="alert alert-info">
+                            <strong>Coming Soon:</strong> Detailed price charts with 30-day, 90-day, and yearly trends to help you make better selling decisions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Enhanced Market Guru Styles */
+.market-guru-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.market-guru-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+.market-guru-section h4 {
+    color: white;
+    font-weight: 700;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.insights-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+    position: relative;
+    z-index: 2;
+    padding: 10px;
+}
+
+.insight-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    color: #333;
+    border: 3px solid #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.insight-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.18);
+    border-color: #3b82f6;
+}
+
+.insight-card.insight-up {
+    border: 3px solid #10b981;
+    background: linear-gradient(145deg, #f0fdf4 0%, #ffffff 100%);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15);
+}
+
+.insight-card.insight-up:hover {
+    border-color: #059669;
+    box-shadow: 0 25px 60px rgba(16, 185, 129, 0.25);
+}
+
+.insight-card.insight-down {
+    border: 3px solid #ef4444;
+    background: linear-gradient(145deg, #fef2f2 0%, #ffffff 100%);
+    box-shadow: 0 12px 40px rgba(239, 68, 68, 0.15);
+}
+
+.insight-card.insight-down:hover {
+    border-color: #dc2626;
+    box-shadow: 0 25px 60px rgba(239, 68, 68, 0.25);
+}
+
+.insight-card.insight-stable {
+    border: 3px solid #f59e0b;
+    background: linear-gradient(145deg, #fffbeb 0%, #ffffff 100%);
+    box-shadow: 0 12px 40px rgba(245, 158, 11, 0.15);
+}
+
+.insight-card.insight-stable:hover {
+    border-color: #d97706;
+    box-shadow: 0 25px 60px rgba(245, 158, 11, 0.25);
+}
+
+/* Crop Header */
+.crop-header {
+    display: flex;
+    align-items: center;
+    padding: 25px 30px 20px;
+    border-bottom: 2px solid #f1f5f9;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    position: relative;
+}
+
+.crop-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 30px;
+    right: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+}
+
+.crop-icon {
+    font-size: 2.8rem;
+    margin-right: 18px;
+    filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.15));
+    background: rgba(255,255,255,0.8);
+    padding: 8px;
+    border-radius: 12px;
+    border: 2px solid rgba(0,0,0,0.05);
+}
+
+.crop-name {
+    flex: 1;
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1f2937;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.trend-indicator {
+    font-size: 1.8rem;
+}
+
+.trend-arrow.up { color: #10b981; }
+.trend-arrow.down { color: #ef4444; }
+.trend-arrow.stable { color: #f59e0b; }
+
+/* Price Analysis */
+.price-analysis {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.price-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.price-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.price-value.current {
+    color: #374151;
+}
+
+.price-value.predicted {
+    color: #059669;
+}
+
+.price-change {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.change-badge {
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.change-badge:hover {
+    transform: scale(1.05);
+}
+
+.change-badge.change-up {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.change-badge.change-down {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.change-badge.change-stable {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.confidence-tag {
+    font-size: 0.8rem;
+    color: #6b7280;
+    background: #e5e7eb;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+/* Action Section */
+.action-section {
+    padding: 25px 30px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.action-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.action-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.action-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.advice-box {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    padding: 18px;
+    border-radius: 15px;
+    border: 2px solid #cbd5e1;
+    border-left: 5px solid #3b82f6;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #334155;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Intelligence Footer */
+.intelligence-footer {
+    padding: 20px 30px 25px;
+    background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%);
+    border-top: 1px solid #e2e8f0;
+    border-radius: 0 0 17px 17px;
+}
+
+.reason-text {
+    font-size: 0.85rem;
+    color: #4b5563;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.timeframe-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #ddd6fe;
+    color: #5b21b6;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.time-icon {
+    margin-right: 5px;
+}
+
+/* Enhanced Border Effects */
+.insight-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 20px 20px 0 0;
+}
+
+.insight-card.insight-up::before {
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.insight-card.insight-down::before {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.insight-card.insight-stable::before {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+/* Price Change Animation */
+.price-value {
+    transition: all 0.3s ease;
+}
+
+.price-value:hover {
+    transform: scale(1.05);
+}
+
+/* Action Button Styling */
+.action-text {
+    padding: 8px 16px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 2px solid #cbd5e1;
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .insights-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        padding: 5px;
+    }
+    
+    .market-guru-section {
+        padding: 20px 15px;
+        border-radius: 15px;
+    }
+    
+    .market-guru-section h4 {
+        font-size: 1.4rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .crop-header {
+        padding: 20px 20px 15px;
+    }
+    
+    .crop-name {
+        font-size: 1.4rem;
+    }
+    
+    .crop-icon {
+        font-size: 2.2rem;
+        margin-right: 15px;
+        padding: 6px;
+    }
+    
+    .price-analysis, .action-section {
+        padding: 20px;
+    }
+    
+    .intelligence-footer {
+        padding: 15px 20px 20px;
+    }
+    
+    .insight-card {
+        border-width: 2px;
+        margin-bottom: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Show price history modal
+function showPriceHistory(cropName) {
+    document.getElementById('cropName').textContent = cropName;
+    const modal = new bootstrap.Modal(document.getElementById('priceHistoryModal'));
+    modal.show();
+}
+
+// Auto-refresh market data
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation to price cards
+    const priceCards = document.querySelectorAll('.price-card');
+    priceCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('fade-in');
+        }, index * 100);
+    });
+
+    // Set up auto-refresh every 5 minutes
+    setInterval(() => {
+        if (navigator.onLine) {
+            // Show refresh indicator
+            showNotification('🔄 Updating market prices...', 'info', 2000);
+            
+            // Simulate refresh (in real app, this would make an API call)
+            setTimeout(() => {
+                // window.location.reload();
+                showNotification('✅ Prices updated!', 'success', 2000);
+            }, 2000);
+        }
+    }, 300000); // 5 minutes
+
+    // Price alerts based on changes
+    {% if market_data and market_data.prices %}
+    // Market data notifications removed - using real AGMARKNET data
+
+    {% endif %}
+});
+
+// Export market data
+function exportMarketData() {
+    const data = {{ market_data.prices | tojson if market_data else '[]' }};
+    const csv = convertToCSV(data);
+    downloadCSV(csv, 'market-prices-' + new Date().toISOString().split('T')[0] + '.csv');
+}
+
+function convertToCSV(data) {
+    const headers = ['Crop', 'Current Price (₹)', 'Yesterday Price (₹)', 'Change (%)', 'Unit', 'Market'];
+    const rows = data.map(item => [
+        item.crop,
+        item.current_price,
+        item.yesterday_price,
+        item.change_percent,
+        item.unit,
+        item.market
+    ]);
+    
+    return [headers, ...rows].map(row => row.join(',')).join('\n');
+}
+
+function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+// Market insights refresh function
+function refreshInsights() {
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Analyzing...';
+    button.disabled = true;
+    
+    fetch('/api/market-insights')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API Response:', data); // Debug log
+            if (data.success && data.insights && data.insights.length > 0) {
+                updateInsightsDisplay(data.insights);
+                showNotification(`✅ Market insights loaded for ${data.insights.length} crops!`, 'success');
+            } else {
+                console.error('No insights in response:', data);
+                showNotification('❌ No market insights available at the moment.', 'warning');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching insights:', error);
+            showNotification('❌ Error fetching market insights. Please try again.', 'error');
+        })
+        .finally(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+}
+
+function updateInsightsDisplay(insights) {
+    const container = document.querySelector('.insights-container');
+    if (!container) return;
+    
+    // Clear container and set proper grid layout
+    container.innerHTML = '';
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(auto-fit, minmax(380px, 1fr))';
+    container.style.gap = '30px';
+    container.style.marginTop = '30px';
+    container.style.padding = '10px';
+    
+    if (!insights || insights.length === 0) {
+        container.innerHTML = '<div class="alert alert-warning">No insights available</div>';
+        return;
+    }
+    
+    insights.forEach(insight => {
+        const card = document.createElement('div');
+        card.className = `insight-card insight-${insight.trend.toLowerCase()}`;
+        
+        // Apply inline styles to ensure borders show
+        card.style.cssText = `
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            color: #333;
+            border: 3px solid ${insight.trend === 'UP' ? '#10b981' : insight.trend === 'DOWN' ? '#ef4444' : '#f59e0b'};
+            margin-bottom: 20px;
+        `;
+        
+        const trendArrow = insight.trend === 'UP' ? '↗️' : insight.trend === 'DOWN' ? '↘️' : '→';
+        
+        const cropIcons = {
+            'Rice': '🌾', 'Wheat': '🌾', 'Cotton': '🌿', 'Onion': '🧅',
+            'Potato': '🥔', 'Tomato': '🍅', 'Sugarcane': '🌱', 'Maize': '🌽'
+        };
+        const cropIcon = cropIcons[insight.crop] || '🌱';
+        
+        const actionIcons = {
+            'HOLD': '🤝', 'SELL': '💰', 'WAIT': '⏳', 'MONITOR': '📊'
+        };
+        const actionIcon = actionIcons[insight.action] || '📊';
+        
+        card.innerHTML = `
+            <div class="crop-header" style="display: flex; align-items: center; padding: 25px 30px 20px; border-bottom: 2px solid #f1f5f9; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);">
+                <div class="crop-icon" style="font-size: 2.8rem; margin-right: 18px; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 12px; border: 2px solid rgba(0,0,0,0.05);">${cropIcon}</div>
+                <h4 class="crop-name" style="flex: 1; margin: 0; font-size: 1.6rem; font-weight: 800; color: #1f2937;">${insight.crop}</h4>
+                <div class="trend-indicator" style="font-size: 1.8rem;">
+                    <span class="trend-arrow" style="color: ${insight.trend === 'UP' ? '#10b981' : insight.trend === 'DOWN' ? '#ef4444' : '#f59e0b'};">${trendArrow}</span>
+                </div>
+            </div>
+            <div class="price-analysis" style="padding: 25px 30px; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-bottom: 1px solid #e2e8f0;">
+                <div class="price-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="price-label" style="font-size: 0.9rem; color: #6b7280; font-weight: 500;">Current Price</div>
+                    <div class="price-value current" style="font-size: 1.3rem; font-weight: 700; color: #374151;">₹${insight.current_price}</div>
+                </div>
+                <div class="price-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="price-label" style="font-size: 0.9rem; color: #6b7280; font-weight: 500;">Predicted Price</div>
+                    <div class="price-value predicted" style="font-size: 1.3rem; font-weight: 700; color: #059669;">₹${insight.predicted_price}</div>
+                </div>
+                <div class="price-change" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                    <span class="change-badge" style="padding: 8px 16px; border-radius: 25px; font-weight: 700; font-size: 0.9rem; background: ${insight.trend === 'UP' ? '#dcfce7' : insight.trend === 'DOWN' ? '#fee2e2' : '#fef3c7'}; color: ${insight.trend === 'UP' ? '#166534' : insight.trend === 'DOWN' ? '#991b1b' : '#92400e'};">
+                        ${insight.trend === 'UP' ? '+' : insight.trend === 'DOWN' ? '-' : ''}${Math.abs(insight.percentage_change)}%
+                    </span>
+                    <span class="confidence-tag" style="font-size: 0.8rem; color: #6b7280; background: #e5e7eb; padding: 4px 8px; border-radius: 12px;">${insight.confidence} Confidence</span>
+                </div>
+            </div>
+            <div class="action-section" style="padding: 25px 30px; background: #ffffff; border-bottom: 1px solid #e2e8f0;">
+                <div class="action-header" style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <span class="action-icon" style="font-size: 1.5rem; margin-right: 10px;">${actionIcon}</span>
+                    <span class="action-text" style="font-size: 1.1rem; font-weight: 700; color: #1f2937; padding: 8px 16px; border-radius: 25px; background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 2px solid #cbd5e1;">${insight.action}</span>
+                </div>
+                <div class="advice-box" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); padding: 18px; border-radius: 15px; border: 2px solid #cbd5e1; border-left: 5px solid #3b82f6; font-size: 0.95rem; line-height: 1.6; color: #334155;">
+                    ${insight.advice}
+                </div>
+            </div>
+            <div class="intelligence-footer" style="padding: 20px 30px 25px; background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%); border-radius: 0 0 17px 17px;">
+                <div class="reason-text" style="font-size: 0.85rem; color: #4b5563; margin-bottom: 10px; line-height: 1.4;">
+                    <strong>📊 Analysis:</strong> ${insight.reason.substring(0, 80)}${insight.reason.length > 80 ? '...' : ''}
+                </div>
+                <div class="timeframe-tag" style="display: inline-flex; align-items: center; background: #ddd6fe; color: #5b21b6; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 600;">
+                    <span class="time-icon" style="margin-right: 5px;">⏰</span> ${insight.timeframe}
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}

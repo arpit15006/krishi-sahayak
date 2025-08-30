@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}Yield Prediction - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Voice Assistant Button -->
+    <div class="voice-assistant-container mb-4">
+        <button id="voice-button" class="btn btn-primary btn-lg voice-btn" onclick="startVoiceInput()">
+            <span id="voice-icon">🗣️</span>
+            <span id="voice-text">बोलिए</span>
+        </button>
+        <button id="language-toggle" class="btn btn-outline-secondary ms-2" onclick="toggleLanguage()">हिं</button>
+        
+        <!-- Listening Animation -->
+        <div id="listening-animation" class="listening-wave" style="display: none;">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+        
+        <!-- Processing Animation -->
+        <div id="processing-animation" class="processing-spinner" style="display: none;">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Processing...</span>
+            </div>
+            <span class="ms-2">AI विश्लेषण कर रहा है...</span>
+        </div>
+        
+        <!-- Voice Response -->
+        <div id="voice-response" class="voice-response mt-3" style="display: none;"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="h2 mb-3">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            {{ get_text('ai_crop_yield_prediction') }}
+        </h1>
+        <p class="lead text-muted">
+            {{ get_text('get_ai_predictions') }}
+        </p>
+    </div>
+
+    <!-- Prediction Form -->
+    <div class="row mb-5">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        🌾 {{ get_text('predict_your_crop_yield') }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="yield-prediction-form">
+                        <div class="row g-4">
+                            <div class="col-12 col-md-6">
+                                <label for="crop_type" class="form-label">{{ get_text('crop_type') }}</label>
+                                <select class="form-select" id="crop_type" name="crop_type" required>
+                                    <option value="">{{ get_text('select_crop') }}</option>
+                                    {% for crop in user_crops %}
+                                    <option value="{{ crop }}">{{ crop }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="variety" class="form-label">{{ get_text('crop_variety') }}</label>
+                                <input type="text" class="form-control" id="variety" name="variety" placeholder="{{ get_text('eg_basmati_ir64') }}" required>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="area" class="form-label">{{ get_text('farming_area_acres') }}</label>
+                                <input type="number" class="form-control" id="area" name="area" step="0.1" min="0.1" required>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="sowing_date" class="form-label">{{ get_text('sowing_date') }}</label>
+                                <input type="date" class="form-control" id="sowing_date" name="sowing_date" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">{{ get_text('farming_practices') }}</label>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="organic" name="practices" value="Organic">
+                                            <label class="form-check-label" for="organic">{{ get_text('organic') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="drip" name="practices" value="Drip Irrigation">
+                                            <label class="form-check-label" for="drip">{{ get_text('drip_irrigation') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="fertilizer" name="practices" value="Fertilizer">
+                                            <label class="form-check-label" for="fertilizer">{{ get_text('fertilizer_use') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="pesticide" name="practices" value="Pesticide">
+                                            <label class="form-check-label" for="pesticide">{{ get_text('pesticide_use') }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                {{ get_text('predict_yield') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction Results -->
+    <div id="prediction-results" class="row" style="display: none;">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">🎯 AI Yield Prediction Results</h3>
+                </div>
+                <div class="card-body" id="prediction-content">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div id="prediction-loading" class="text-center" style="display: none;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">AI is analyzing your crop data...</p>
+    </div>
+</div>
+
+<style>
+.voice-btn {
+    border-radius: 50px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.voice-btn.listening {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.listening-wave {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.wave {
+    width: 10px;
+    height: 30px;
+    background: #28a745;
+    margin: 0 2px;
+    border-radius: 5px;
+    animation: wave 1.2s infinite ease-in-out;
+}
+
+.wave:nth-child(2) { animation-delay: -1.1s; }
+.wave:nth-child(3) { animation-delay: -1.0s; }
+
+@keyframes wave {
+    0%, 40%, 100% { transform: scaleY(0.4); }
+    20% { transform: scaleY(1.0); }
+}
+
+.voice-response {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    border-left: 4px solid #28a745;
+}
+
+.processing-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* Systematic AI Analysis Styles */
+.ai-analysis-systematic {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #28a745;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.analysis-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.section-header {
+    color: #28a745;
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    font-size: 1.1rem;
+}
+
+.analysis-content {
+    line-height: 1.6;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.analysis-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.analysis-list li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+    line-height: 1.5;
+    color: #495057;
+}
+
+.analysis-list li:before {
+    content: '•';
+    color: #28a745;
+    font-weight: bold;
+    position: absolute;
+    left: 8px;
+}
+
+.analysis-section:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .ai-analysis-systematic {
+        padding: 15px;
+    }
+    
+    .analysis-section {
+        padding: 12px;
+    }
+    
+    .section-header {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script src="{{ url_for('static', filename='js/voice-assistant.js') }}"></script>
+<script>
+document.getElementById('yield-prediction-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Get selected practices
+    const practices = Array.from(document.querySelectorAll('input[name="practices"]:checked'))
+                          .map(cb => cb.value);
+    data.practices = practices;
+    
+    // Show loading
+    document.getElementById('prediction-loading').style.display = 'block';
+    document.getElementById('prediction-results').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/yield-prediction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            displayPredictionResults(result.prediction);
+        } else {
+            showNotification('Prediction failed: ' + result.error, 'error');
+        }
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+    
+    document.getElementById('prediction-loading').style.display = 'none';
+});
+
+function displayPredictionResults(prediction) {
+    const content = document.getElementById('prediction-content');
+    
+    // Generate recommendations HTML
+    let recommendationsHtml = '';
+    if (prediction.recommendations && Array.isArray(prediction.recommendations)) {
+        recommendationsHtml = prediction.recommendations.map(rec => `<li>✅ ${rec}</li>`).join('');
+    } else {
+        recommendationsHtml = `
+            <li>✅ Continue current practices</li>
+            <li>✅ Monitor soil moisture</li>
+            <li>✅ Apply fertilizer as needed</li>
+            <li>✅ Watch for pest activity</li>
+        `;
+    }
+    
+    // Generate timeline info
+    const currentStage = prediction.timeline?.current_stage || 'Growth stage';
+    const harvestDate = prediction.harvest_date || 'March 2025';
+    const marketDate = prediction.market_date || 'March 15, 2025';
+    
+    const formattedAnalysis = formatAIAnalysisSystematic(prediction.ai_analysis || 'Based on your farming practices and current weather conditions, your crop shows excellent potential.');
+    
+    content.innerHTML = `
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <h5>📊 Yield Prediction</h5>
+                <div class="prediction-card">
+                    <div class="h3 text-success">${prediction.yield_per_acre || prediction.expected_yield || '2.5-3.2'} tons/acre</div>
+                    <p class="text-muted">Expected yield for ${prediction.crop}</p>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6">
+                <h5>💰 Expected Revenue</h5>
+                <div class="prediction-card">
+                    <div class="h3 text-primary">₹${prediction.expected_revenue || '1,25,000'}</div>
+                    <p class="text-muted">Total expected income</p>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <h5>🤖 AI Analysis</h5>
+                <div class="ai-analysis-systematic">
+                    ${formattedAnalysis}
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6">
+                <h5>📈 Recommendations</h5>
+                <ul class="list-unstyled">
+                    ${recommendationsHtml}
+                </ul>
+            </div>
+            
+            <div class="col-12 col-md-6">
+                <h5>📅 Timeline</h5>
+                <ul class="list-unstyled">
+                    <li>🌱 Current: ${currentStage}</li>
+                    <li>🌾 Expected harvest: ${harvestDate}</li>
+                    <li>📦 Market ready: ${marketDate}</li>
+                </ul>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('prediction-results').style.display = 'block';
+}
+
+function formatAIAnalysisSystematic(analysisText) {
+    if (!analysisText) return '<p>No analysis available</p>';
+    
+    // Split by sections marked with **
+    const sections = analysisText.split(/\*\*([^*]+)\*\*/g);
+    let formattedHtml = '';
+    
+    for (let i = 0; i < sections.length; i++) {
+        const section = sections[i].trim();
+        if (!section) continue;
+        
+        if (i % 2 === 1) {
+            // This is a header
+            const icon = getSectionIcon(section);
+            formattedHtml += `<div class="analysis-section"><h6 class="section-header">${icon} ${section}</h6>`;
+        } else {
+            // This is content
+            const content = section.trim();
+            if (content) {
+                // Format bullet points
+                const formattedContent = content
+                    .replace(/\* ([^\n]+)/g, '<li>$1</li>')
+                    .replace(/\n\n/g, '</p><p>')
+                    .replace(/\n/g, '<br>');
+                
+                if (formattedContent.includes('<li>')) {
+                    formattedHtml += `<ul class="analysis-list">${formattedContent}</ul></div>`;
+                } else {
+                    formattedHtml += `<p class="analysis-content">${formattedContent}</p></div>`;
+                }
+            }
+        }
+    }
+    
+    // If no sections found, format as simple text
+    if (!formattedHtml) {
+        const lines = analysisText.split('\n').filter(line => line.trim());
+        formattedHtml = '<div class="analysis-section">';
+        
+        lines.forEach(line => {
+            line = line.trim();
+            if (line.startsWith('**') && line.endsWith('**')) {
+                const header = line.replace(/\*\*/g, '');
+                const icon = getSectionIcon(header);
+                formattedHtml += `<h6 class="section-header">${icon} ${header}</h6>`;
+            } else if (line.startsWith('*')) {
+                formattedHtml += `<li>${line.substring(1).trim()}</li>`;
+            } else if (line) {
+                formattedHtml += `<p class="analysis-content">${line}</p>`;
+            }
+        });
+        
+        formattedHtml += '</div>';
+    }
+    
+    return formattedHtml;
+}
+
+function getSectionIcon(sectionName) {
+    const name = sectionName.toLowerCase();
+    if (name.includes('yield') || name.includes('उत्पादन')) return '📊';
+    if (name.includes('revenue') || name.includes('आय')) return '💰';
+    if (name.includes('success') || name.includes('सफलता')) return '✅';
+    if (name.includes('recommendation') || name.includes('सिफारिश')) return '💡';
+    if (name.includes('timeline') || name.includes('समय')) return '📅';
+    if (name.includes('risk') || name.includes('जोखिम')) return '⚠️';
+    if (name.includes('farmer') || name.includes('किसान')) return '👨‍🌾';
+    if (name.includes('crop') || name.includes('फसल')) return '🌾';
+    return '📋';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,557 @@
+/* 🌾 Dashboard Enhancements - Farmer-Friendly Animations */
+
+/* Welcome Card Enhancements */
+.welcome-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(167, 201, 87, 0.1) 100%);
+  border: 3px solid var(--accent-green);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(167, 201, 87, 0.2), transparent);
+  animation: rotate-welcome 8s linear infinite;
+  opacity: 0.5;
+}
+
+.welcome-animation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.farmer-avatar {
+  font-size: 4rem;
+  animation: wave-hello 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.crop-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.crop-icon {
+  font-size: 2rem;
+  animation: grow-crops 2s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.crop-icon:nth-child(1) { --delay: 0s; }
+.crop-icon:nth-child(2) { --delay: 0.5s; }
+.crop-icon:nth-child(3) { --delay: 1s; }
+
+.welcome-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-glow 3s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+.location-info {
+  font-size: 1.1rem;
+  color: var(--soil-brown);
+  position: relative;
+  z-index: 2;
+}
+
+/* Farming Stats */
+.farming-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--light-green);
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: var(--secondary-green);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-green);
+  margin-bottom: 0.5rem;
+  animation: count-up 2s ease-out;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--soil-brown);
+  font-weight: 600;
+}
+
+/* Enhanced Action Buttons */
+.action-icon-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.action-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--gradient-success);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+.action-badge.trending {
+  background: linear-gradient(45deg, #f59e0b, #ea580c);
+}
+
+.action-badge.blockchain {
+  background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+}
+
+.action-badge.insurance {
+  background: linear-gradient(45deg, #06b6d4, #0891b2);
+}
+
+.action-badge.prediction {
+  background: linear-gradient(45deg, #ec4899, #db2777);
+}
+
+.action-badge.resources {
+  background: linear-gradient(45deg, #10b981, #059669);
+}
+
+.action-stats {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid rgba(167, 201, 87, 0.3);
+}
+
+.success-rate,
+.live-indicator,
+.blockchain-indicator,
+.protection-indicator,
+.accuracy-indicator,
+.resource-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.live-indicator {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+.blockchain-indicator {
+  color: var(--info);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.protection-indicator {
+  color: var(--sky-blue);
+  background: rgba(14, 165, 233, 0.1);
+}
+
+.accuracy-indicator {
+  color: var(--harvest-orange);
+  background: rgba(234, 88, 12, 0.1);
+}
+
+.resource-count {
+  color: var(--primary-green);
+  background: rgba(45, 80, 22, 0.1);
+}
+
+/* Enhanced Weather Widget */
+.weather-widget {
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-widget::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: weather-shimmer 4s ease-in-out infinite;
+}
+
+/* Enhanced Market Ticker */
+.market-ticker {
+  position: relative;
+}
+
+.market-ticker::before {
+  content: '📈 LIVE MARKET DATA';
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: var(--gradient-success);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  z-index: 10;
+  animation: market-pulse 2s ease-in-out infinite;
+}
+
+.price-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.price-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.price-item:hover::before {
+  left: 100%;
+}
+
+/* Enhanced AI Assistant */
+.ai-assistant-prominent {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-assistant-prominent::after {
+  content: '🤖';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: ai-float 3s ease-in-out infinite;
+}
+
+/* Enhanced Alert Section */
+.alert-section {
+  position: relative;
+}
+
+.alert-section::after {
+  content: '🚨';
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.5rem;
+  animation: alert-blink 1s ease-in-out infinite;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .welcome-animation {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .farming-stats {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .stat-item {
+    min-width: 80px;
+  }
+  
+  .crop-icons {
+    justify-content: center;
+  }
+  
+  .farmer-avatar {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-animation {
+    margin-bottom: 1rem;
+  }
+  
+  .farmer-avatar {
+    font-size: 2.5rem;
+  }
+  
+  .crop-icon {
+    font-size: 1.5rem;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .action-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+}
+
+/* Animations */
+@keyframes rotate-welcome {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes wave-hello {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+@keyframes grow-crops {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes text-glow {
+  0%, 100% { text-shadow: 0 0 10px rgba(45, 80, 22, 0.3); }
+  50% { text-shadow: 0 0 20px rgba(45, 80, 22, 0.6), 0 0 30px rgba(167, 201, 87, 0.4); }
+}
+
+@keyframes count-up {
+  from { 
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes weather-shimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes market-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+
+@keyframes ai-float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+@keyframes alert-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* Interactive Hover Effects */
+.action-btn:hover .action-icon-container svg {
+  animation: icon-bounce 0.6s ease-in-out;
+}
+
+.action-btn:hover .action-badge {
+  animation: badge-wiggle 0.5s ease-in-out;
+}
+
+@keyframes icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes badge-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+}
+
+/* Loading States */
+.stat-number.loading {
+  animation: loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Success Animations */
+.success-animation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  z-index: 9999;
+  animation: success-pop 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes success-pop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* Particle Effects Container */
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: particle-float 3s ease-out forwards;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Focus States */
+.action-btn:focus-visible {
+  outline: 3px solid var(--accent-green);
+  outline-offset: 4px;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.stat-item:focus-visible {
+  outline: 2px solid var(--secondary-green);
+  outline-offset: 2px;
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  .welcome-card {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.95) 0%, rgba(74, 124, 89, 0.2) 100%);
+    border-color: var(--secondary-green);
+  }
+  
+  .stat-item {
+    background: rgba(45, 55, 72, 0.8);
+    border-color: var(--secondary-green);
+  }
+  
+  .welcome-text {
+    color: var(--light-green);
+  }
+  
+  .location-info {
+    color: var(--light-green);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .welcome-animation,
+  .action-badge,
+  .particles-container {
+    display: none;
+  }
+  
+  .action-btn {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .farmer-avatar,
+  .crop-icon,
+  .welcome-text,
+  .stat-number,
+  .action-badge,
+  .weather-widget::after,
+  .market-ticker::before,
+  .ai-assistant-prominent::after,
+  .alert-section::after {
+    animation: none;
+  }
+  
+  .welcome-card::before {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .action-badge {
+    border: 2px solid currentColor;
+  }
+  
+  .stat-item {
+    border-width: 3px;
+  }
+  
+  .welcome-card {
+    border-width: 4px;
+  }
+}

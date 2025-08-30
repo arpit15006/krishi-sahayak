@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Resource Optimizer - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="h2 mb-3">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            💧 {{ get_text('resource_optimizer') }}
+        </h1>
+        <p class="lead text-muted">
+            {{ get_text('smart_water_fertilizer') }}
+        </p>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Input Form -->
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    🌾 {{ get_text('crop_soil_information') }}
+                </div>
+                <div class="card-body">
+                    <form id="optimizerForm">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                    {{ get_text('crop_type') }} *
+                                </label>
+                                <select class="form-select" id="crop_type" required>
+                                    <option value="">{{ get_text('choose_crop') }}</option>
+                                    <option value="Rice">🌾 Rice</option>
+                                    <option value="Wheat">🌾 Wheat</option>
+                                    <option value="Cotton">🌸 Cotton</option>
+                                    <option value="Maize">🌽 Maize</option>
+                                    <option value="Sugarcane">🎋 Sugarcane</option>
+                                    <option value="Soybean">🫘 Soybean</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    {{ get_text('farm_area') }} ({{ get_text('acres') }}) *
+                                </label>
+                                <input type="number" class="form-control" id="farm_area" step="0.1" min="0.1" value="1" required>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                    </svg>
+                                    {{ get_text('soil_type') }} *
+                                </label>
+                                <select class="form-select" id="soil_type" required>
+                                    <option value="">{{ get_text('choose_soil_type') }}</option>
+                                    <option value="Loamy">Loamy Soil</option>
+                                    <option value="Sandy">Sandy Soil</option>
+                                    <option value="Clay">Clay Soil</option>
+                                    <option value="Black">Black Soil</option>
+                                    <option value="Red">Red Soil</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    {{ get_text('growth_stage') }}
+                                </label>
+                                <select class="form-select" id="growth_stage">
+                                    <option value="Vegetative">{{ get_text('vegetative_growth') }}</option>
+                                    <option value="Flowering">Flowering</option>
+                                    <option value="Fruiting">Fruit Development</option>
+                                    <option value="Maturity">Maturity</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                                {{ get_text('calculate_optimization') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="loadingDiv" class="text-center d-none">
+        <div class="spinner-border text-success mb-3"></div>
+        <h5>AI calculating recommendations...</h5>
+        <p class="text-muted">Please wait</p>
+    </div>
+
+    <div id="resultsDiv" class="d-none">
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-primary">💧 Water Requirements</h5>
+                        <div id="waterResults"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-success">🌱 Fertilizer Needs</h5>
+                        <div id="fertilizerResults"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-warning">💰 Cost Analysis</h5>
+                        <div id="costResults"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-info">💡 Tips</h5>
+                        <div id="tipsResults"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('optimizerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show loading
+    document.getElementById('loadingDiv').classList.remove('d-none');
+    document.getElementById('resultsDiv').classList.add('d-none');
+    
+    // Collect form data
+    const formData = {
+        crop_type: document.getElementById('crop_type').value,
+        farm_area: document.getElementById('farm_area').value,
+        soil_type: document.getElementById('soil_type').value,
+        growth_stage: document.getElementById('growth_stage').value
+    };
+    
+    // Validate required fields
+    if (!formData.crop_type || !formData.soil_type || !formData.farm_area) {
+        alert('Please fill all required fields');
+        document.getElementById('loadingDiv').classList.add('d-none');
+        return;
+    }
+    
+    // Simulate API call with mock data
+    setTimeout(() => {
+        document.getElementById('loadingDiv').classList.add('d-none');
+        displayResults({
+            water: {
+                daily_requirement: '500 L/day',
+                irrigation_frequency: 'Every 3 days',
+                method: 'Drip irrigation'
+            },
+            fertilizer: {
+                nitrogen: '120 kg/acre',
+                phosphorus: '60 kg/acre',
+                potash: '40 kg/acre'
+            },
+            cost: {
+                total_cost: '₹15,000/acre'
+            },
+            tips: [
+                'Use drip irrigation to save water',
+                'Apply organic compost',
+                'Monitor soil moisture regularly'
+            ]
+        });
+    }, 2000);
+});
+
+function displayResults(recommendations) {
+    // Water results
+    const waterHtml = `
+        <div class="mb-2">
+            <strong>Daily Need:</strong><br>
+            <span class="text-primary">${recommendations.water.daily_requirement}</span>
+        </div>
+        <div class="mb-2">
+            <strong>Frequency:</strong><br>
+            <span class="text-primary">${recommendations.water.irrigation_frequency}</span>
+        </div>
+    `;
+    
+    // Fertilizer results
+    const fertilizerHtml = `
+        <div class="row text-center">
+            <div class="col-4">
+                <div class="bg-light p-2 rounded mb-1">
+                    <strong>N</strong><br>
+                    <small>${recommendations.fertilizer.nitrogen}</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="bg-light p-2 rounded mb-1">
+                    <strong>P</strong><br>
+                    <small>${recommendations.fertilizer.phosphorus}</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="bg-light p-2 rounded mb-1">
+                    <strong>K</strong><br>
+                    <small>${recommendations.fertilizer.potash}</small>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Cost results
+    const costHtml = `
+        <div class="h4 text-warning">${recommendations.cost.total_cost}</div>
+        <small class="text-muted">Estimated total cost</small>
+    `;
+    
+    // Tips results
+    const tipsHtml = recommendations.tips.map(tip => `<li class="text-start">${tip}</li>`).join('');
+    
+    // Update DOM
+    document.getElementById('waterResults').innerHTML = waterHtml;
+    document.getElementById('fertilizerResults').innerHTML = fertilizerHtml;
+    document.getElementById('costResults').innerHTML = costHtml;
+    document.getElementById('tipsResults').innerHTML = `<ul class="list-unstyled">${tipsHtml}</ul>`;
+    
+    // Show results
+    document.getElementById('resultsDiv').classList.remove('d-none');
+}
+</script>
+{% endblock %}

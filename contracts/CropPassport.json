@@ -1,0 +1,68 @@
+{
+  "address": "0x8D847b22Cc6Fa4e5f6c4E1C5F7d7394f53B0eaf9",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {"indexed": true, "name": "tokenId", "type": "uint256"},
+        {"indexed": true, "name": "farmer", "type": "address"},
+        {"indexed": false, "name": "cropType", "type": "string"},
+        {"indexed": false, "name": "season", "type": "string"}
+      ],
+      "name": "PassportCreated",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {"name": "cropType", "type": "string"},
+        {"name": "season", "type": "string"},
+        {"name": "ipfsHash", "type": "string"},
+        {"name": "location", "type": "string"},
+        {"name": "area", "type": "uint256"}
+      ],
+      "name": "mintPassport",
+      "outputs": [{"name": "", "type": "uint256"}],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "tokenId", "type": "uint256"}],
+      "name": "getPassport",
+      "outputs": [
+        {"name": "cropType", "type": "string"},
+        {"name": "season", "type": "string"},
+        {"name": "ipfsHash", "type": "string"},
+        {"name": "farmer", "type": "address"},
+        {"name": "timestamp", "type": "uint256"},
+        {"name": "verified", "type": "bool"},
+        {"name": "location", "type": "string"},
+        {"name": "area", "type": "uint256"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "farmer", "type": "address"}],
+      "name": "getFarmerPassports",
+      "outputs": [{"name": "", "type": "uint256[]"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [{"name": "", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "network": "MONAD Testnet",
+  "chain_id": 10143,
+  "deployed": true,
+  "transaction_hash": "5e59802d564fd10e59ef7386fc3b1e3a10c527be3af6d0eff1301ddaea201cc3"
+}

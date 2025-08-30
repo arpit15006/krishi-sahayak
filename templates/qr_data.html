@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}QR Code Data - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">📱 QR Code Contains This Data:</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Farmer Information -->
+                        <div class="col-12 col-md-6">
+                            <h4>👨‍🌾 Farmer Details</h4>
+                            <table class="table table-sm">
+                                <tr><td><strong>Name:</strong></td><td>{{ data.farmer.name }}</td></tr>
+                                <tr><td><strong>Location:</strong></td><td>{{ data.farmer.location }}</td></tr>
+                                <tr><td><strong>District:</strong></td><td>{{ data.farmer.district or 'N/A' }}</td></tr>
+                                <tr><td><strong>State:</strong></td><td>{{ data.farmer.state or 'N/A' }}</td></tr>
+                                <tr><td><strong>PIN Code:</strong></td><td>{{ data.farmer.pincode }}</td></tr>
+                                <tr><td><strong>Phone:</strong></td><td>{{ data.farmer.phone or 'N/A' }}</td></tr>
+                                <tr><td><strong>Experience:</strong></td><td>{{ data.farmer.experience }} years</td></tr>
+                            </table>
+                        </div>
+                        
+                        <!-- Crop Information -->
+                        <div class="col-12 col-md-6">
+                            <h4>🌾 Crop Details</h4>
+                            <table class="table table-sm">
+                                <tr><td><strong>Crop Type:</strong></td><td>{{ data.crop.type }}</td></tr>
+                                <tr><td><strong>Season:</strong></td><td>{{ data.crop.season }}</td></tr>
+                                <tr><td><strong>Harvest Date:</strong></td><td>{{ data.crop.harvest_date | format_date }}</td></tr>
+                                <tr><td><strong>Area:</strong></td><td>{{ data.crop.area }}</td></tr>
+                                <tr><td><strong>Practices:</strong></td><td>{{ data.crop.practices }}</td></tr>
+                            </table>
+                        </div>
+                        
+                        <!-- Verification Info -->
+                        <div class="col-12">
+                            <h4>🔐 Blockchain Verification</h4>
+                            <table class="table table-sm">
+                                <tr><td><strong>Passport ID:</strong></td><td><code>{{ data.passport_id }}</code></td></tr>
+                                <tr><td><strong>Blockchain:</strong></td><td>{{ data.verification.blockchain }}</td></tr>
+                                <tr><td><strong>IPFS Hash:</strong></td><td><code>{{ data.verification.ipfs_hash }}</code></td></tr>
+                                <tr><td><strong>Status:</strong></td><td><span class="badge bg-success">✅ Verified</span></td></tr>
+                                <tr><td><strong>Verify URL:</strong></td><td><a href="{{ data.verification.verify_url }}" target="_blank">{{ data.verification.verify_url }}</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <h5>📱 How to Use:</h5>
+                        <ol>
+                            <li><strong>Buyers:</strong> Scan QR to see all farmer and crop details instantly</li>
+                            <li><strong>Verification:</strong> Click verify URL to check blockchain authenticity</li>
+                            <li><strong>Traceability:</strong> Full supply chain transparency from farm to market</li>
+                            <li><strong>Premium Pricing:</strong> Verified data enables higher crop prices</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

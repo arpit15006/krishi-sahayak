@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Crop Passport - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            {% if passport %}
+            <!-- Verified Passport -->
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h2 class="mb-0">
+                        ✅ Verified Crop Passport
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-6">
+                            <h4>{{ passport.crop_type }}</h4>
+                            <p class="text-muted">{{ passport.season }} Season</p>
+                            
+                            <div class="mb-3">
+                                <strong>Token ID:</strong><br>
+                                <code>{{ passport.nft_token_id }}</code>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Created:</strong><br>
+                                {{ passport.created_at | format_date }}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>IPFS Hash:</strong><br>
+                                <a href="https://gateway.pinata.cloud/ipfs/{{ passport.ipfs_hash }}" target="_blank" class="text-decoration-none">
+                                    {{ passport.ipfs_hash[:20] }}...
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <div class="alert alert-success">
+                                <h5>🛡️ Blockchain Verified</h5>
+                                <p class="mb-0">This passport is authentic and stored on MONAD blockchain with IPFS metadata.</p>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="https://gateway.pinata.cloud/ipfs/{{ passport.ipfs_hash }}" target="_blank" class="btn btn-primary">
+                                    📄 View Full Certificate
+                                </a>
+                                <button class="btn btn-outline-secondary" onclick="window.print()">
+                                    🖨️ Print Certificate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- Invalid Passport -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <h2 class="mb-0">
+                        ❌ Invalid Passport
+                    </h2>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead">This passport could not be verified.</p>
+                    <p>The token ID may be incorrect or the passport may not exist.</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-success">
+                    🌱 Back to Krishi Sahayak
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

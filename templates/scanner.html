@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}{{ get_text('scanner') }} - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4 scanner-header" data-animation="fadeInUp" data-delay="100">
+                <div class="scanner-icon-container mb-3">
+                    <div class="scanner-rings">
+                        <div class="scan-ring ring-1"></div>
+                        <div class="scan-ring ring-2"></div>
+                        <div class="scan-ring ring-3"></div>
+                    </div>
+                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="scanner-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <h1 class="h2 mb-3 scanner-title">
+                    {{ get_text('plant_disease_scanner') }}
+                </h1>
+                <p class="lead text-muted scanner-subtitle">
+                    {{ get_text('upload_image') }}
+                </p>
+                <div class="scanner-stats">
+                    <div class="stat-pill">
+                        <span class="stat-icon">🎯</span>
+                        <span>95% Accuracy</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-icon">⚡</span>
+                        <span>Instant Results</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-icon">🌱</span>
+                        <span>50+ Diseases</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Card -->
+            <div class="card mb-4 upload-card" data-animation="slideInUp" data-delay="200">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('scanner') }}">
+                        <div class="scanner-container">
+                            <div class="upload-area enhanced-upload" onclick="document.getElementById('plant_image').click()">
+                                <div class="upload-animation">
+                                    <div class="upload-pulse"></div>
+                                    <div class="upload-icon-container">
+                                        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="upload-icon">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        <div class="upload-sparkles">
+                                            <span class="sparkle" style="--delay: 0s;">✨</span>
+                                            <span class="sparkle" style="--delay: 0.5s;">✨</span>
+                                            <span class="sparkle" style="--delay: 1s;">✨</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3 class="upload-title">{{ get_text('upload_image') }}</h3>
+                                <p class="text-muted upload-description">
+                                    {{ get_text('take_photo') }}
+                                    <br>
+                                    <span class="file-formats">JPG, PNG, GIF (Max 16MB)</span>
+                                </p>
+                                <div class="upload-features">
+                                    <span class="feature-tag">📱 Mobile Friendly</span>
+                                    <span class="feature-tag">🔍 AI Analysis</span>
+                                    <span class="feature-tag">⚡ Fast Results</span>
+                                </div>
+                                <input 
+                                    type="file" 
+                                    class="file-input" 
+                                    id="plant_image" 
+                                    name="plant_image" 
+                                    accept="image/*"
+                                    required
+                                >
+                            </div>
+                            
+                            <!-- Camera Button (shown only on mobile) -->
+                            <div class="text-center mt-3">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-outline-primary camera-btn-enhanced" 
+                                    id="camera-btn" 
+                                    style="display: none;"
+                                >
+                                    <div class="camera-icon-container">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <div class="camera-flash"></div>
+                                    </div>
+                                    {{ get_text('take_photo') }}
+                                </button>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-success btn-lg requires-online analyze-btn-enhanced" disabled id="analyze-btn">
+                                    <div class="btn-content">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 analyze-icon">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                        </svg>
+                                        <span class="btn-text">{{ get_text('analyzing') }}</span>
+                                    </div>
+                                    <div class="btn-shine"></div>
+                                    <div class="btn-particles"></div>
+                                </button>
+                                <div class="analyze-progress" id="analyze-progress" style="display: none;">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill"></div>
+                                    </div>
+                                    <div class="progress-text">AI is analyzing your plant...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ get_text('diagnosis') }}
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-6">
+                            <h4>📸 {{ get_text('take_photo') }}</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    {{ get_text('upload_image') }}
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Focus on affected leaves/parts
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Avoid blurry or dark images
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Include multiple angles if possible
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <h4>🌱 {{ get_text('diagnosis') }}</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Fungal infections (leaf spot, blight)
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Pest damage (caterpillars, aphids)
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Nutrient deficiencies
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Viral diseases
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('plant_image');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const uploadArea = document.querySelector('.upload-area');
+
+    // Enable analyze button when file is selected
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Analyze Plant (${e.target.files[0].name})
+            `;
+        } else {
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Select an Image First
+            `;
+        }
+    });
+
+    // Form submission with loading state
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            showNotification('Please select an image first', 'error');
+            return;
+        }
+
+        // Show loading state
+        analyzeBtn.innerHTML = `
+            <div class="spinner"></div>
+            Analyzing... This may take a few moments
+        `;
+        analyzeBtn.disabled = true;
+
+        // Show progress message
+        setTimeout(() => {
+            showNotification('🔍 AI is analyzing your plant image...', 'info');
+        }, 500);
+    });
+
+    // Add visual feedback for drag states
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        if (!this.contains(e.relatedTarget)) {
+            this.classList.remove('dragover');
+        }
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Mobile camera detection
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        const cameraBtn = document.getElementById('camera-btn');
+        if (cameraBtn) {
+            cameraBtn.style.display = 'inline-block';
+            
+            // Add camera button click handler
+            cameraBtn.addEventListener('click', function() {
+                this.style.animation = 'camera-click 0.5s ease-out';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 500);
+                
+                // Trigger camera functionality
+                if (window.farmerUI && typeof window.farmerUI.openCamera === 'function') {
+                    window.farmerUI.openCamera();
+                }
+            });
+        }
+    }
+    
+    // Add image preview functionality
+    function showImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Find or create preview container
+            let preview = document.querySelector('.image-preview');
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.className = 'image-preview';
+                preview.style.cssText = `
+                    margin-top: 1rem;
+                    text-align: center;
+                    animation: preview-fade-in 0.5s ease-out;
+                `;
+                uploadArea.parentNode.appendChild(preview);
+            }
+            
+            preview.innerHTML = `
+                <img src="${e.target.result}" 
+                     alt="Preview" 
+                     style="max-width: 200px; max-height: 200px; border-radius: 12px; 
+                            object-fit: cover; box-shadow: var(--shadow-md); 
+                            border: 3px solid var(--success);">
+                <p class="mt-2 text-success fw-bold">✅ Ready to analyze: ${file.name}</p>
+            `;
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Update file input to show preview
+    const originalHandler = fileInput.cloneNode();
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            showImagePreview(e.target.files[0]);
+        }
+    });
+    
+    // Add CSS for additional animations
+    const additionalStyles = document.createElement('style');
+    additionalStyles.textContent = `
+        @keyframes upload-click {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes camera-click {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes preview-fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(additionalStyles);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+# MONAD Blockchain Integration Requirements
+
+# Core blockchain libraries
+web3==6.11.3
+eth-account==0.9.0
+eth-utils==2.2.2
+
+# Smart contract compilation
+py-solc-x==1.12.0
+
+# IPFS integration
+requests==2.31.0
+
+# Additional utilities
+python-dotenv==1.0.0
+cryptography==41.0.7

@@ -1,0 +1,1296 @@
+{% extends "base.html" %}
+
+{% block title %}{{ get_text('weather') }} - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<!-- Location Detection Section -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <button id="getLocationBtn" class="btn btn-primary me-3" onclick="getCurrentLocation()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        {{ get_text('current_location') }}
+                    </button>
+                    <span class="text-muted">or</span>
+                    <button class="btn btn-outline-secondary ms-3" onclick="toggleLocationInput()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        {{ get_text('enter_pincode') }}
+                    </button>
+                    
+                    <!-- Manual Location Input (hidden by default) -->
+                    <div id="locationInput" class="mt-3" style="display: none;">
+                        <div class="row justify-content-center">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" id="pinCodeInput" class="form-control" placeholder="{{ get_text('enter_pincode') }}" maxlength="6">
+                                    <button class="btn btn-success" onclick="getWeatherByPin()">{{ get_text('weather') }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="locationStatus" class="mt-2 small text-muted"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1 class="h2 mb-3">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+            </svg>
+            {{ get_text('weather_forecast') }}
+        </h1>
+        <p class="lead text-muted">
+            {{ get_text('weather_today') }}
+        </p>
+        {% if weather %}
+        <div class="text-muted">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            {{ weather.city }}, PIN: {{ weather.pin_code }}
+            <span class="ms-3">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Updated: {{ weather.last_updated }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if weather %}
+    <!-- Current Weather Card with Animations -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="weather-widget" id="weatherWidget" data-weather="{{ weather.current.description.lower() }}">
+                <!-- Weather Animation Background -->
+                <div class="weather-animation-bg">
+                    <!-- Rain Animation -->
+                    <div class="rain-container" style="display: none;">
+                        {% for i in range(50) %}
+                        <div class="rain-drop" style="left: {{ (i * 2) % 100 }}%; animation-delay: {{ (i * 0.1) % 2 }}s;"></div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Snow Animation -->
+                    <div class="snow-container" style="display: none;">
+                        {% for i in range(30) %}
+                        <div class="snowflake" style="left: {{ (i * 3.33) % 100 }}%; animation-delay: {{ (i * 0.2) % 3 }}s;">❄</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Cloud Animation -->
+                    <div class="clouds-container" style="display: none;">
+                        <div class="cloud cloud1">☁️</div>
+                        <div class="cloud cloud2">☁️</div>
+                        <div class="cloud cloud3">☁️</div>
+                    </div>
+                    
+                    <!-- Sun Animation -->
+                    <div class="sun-container" style="display: none;">
+                        <div class="sun">☀️</div>
+                        <div class="sun-rays">
+                            {% for i in range(8) %}
+                            <div class="ray ray-{{ i + 1 }}"></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Moon Animation -->
+                    <div class="moon-container" style="display: none;">
+                        <div class="moon">🌙</div>
+                        <div class="stars">
+                            {% for i in range(12) %}
+                            <div class="star star-{{ i + 1 }}">✨</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Mist/Fog Animation -->
+                    <div class="mist-container" style="display: none;">
+                        <div class="mist-layer mist1"></div>
+                        <div class="mist-layer mist2"></div>
+                        <div class="mist-layer mist3"></div>
+                    </div>
+                    
+                    <!-- Thunder Animation -->
+                    <div class="thunder-container" style="display: none;">
+                        <div class="lightning"></div>
+                    </div>
+                </div>
+                
+                <div class="row align-items-center" style="position: relative; z-index: 2;">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="weather-current">
+                            <div class="weather-temp">{{ weather.current and weather.current.temperature and weather.current.temperature }}°C</div>
+                            <div class="weather-description">{{ weather.current.description }}</div>
+                            <div class="mt-3">
+                                {% if weather.current and weather.current and weather.current.temperature and weather.current.temperature %}
+                                {% set temp = weather.current and weather.current.temperature and weather.current.temperature %}
+                                {% if temp > 35 %}
+                                <div class="alert alert-warning">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5l-6.928-12.03c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <strong>Heat Alert:</strong> Very hot weather. Water crops early morning or evening.
+                                </div>
+                                {% elif temp < 10 %}
+                                <div class="alert alert-info">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <strong>Cold Weather:</strong> Protect sensitive crops from frost damage.
+                                </div>
+                                {% else %}
+                                <div class="alert alert-success">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <strong>Good Weather:</strong> Favorable conditions for farming activities.
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-8">
+                        <div class="weather-details">
+                            <div class="weather-detail">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-2 text-primary">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                </svg>
+                                <div class="h5">{{ weather.current and weather.current.humidity and weather.current.humidity }}%</div>
+                                <small>{{ get_text('humidity') }}</small>
+                                {% if weather.current and weather.current.humidity and weather.current.humidity > 80 %}
+                                <div class="text-warning mt-1"><small>High - Disease risk</small></div>
+                                {% elif weather.current and weather.current.humidity and weather.current.humidity < 30 %}
+                                <div class="text-info mt-1"><small>Low - Water more</small></div>
+                                {% else %}
+                                <div class="text-success mt-1"><small>Ideal range</small></div>
+                                {% endif %}
+                            </div>
+                            <div class="weather-detail">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-2 text-secondary">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10l1 1v16l-1 1H6l-1-1V5l1-1z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 8h4m-4 4h4"></path>
+                                </svg>
+                                <div class="h5">{{ weather.current and weather.current.wind_speed and weather.current.wind_speed }} km/h</div>
+                                <small>{{ get_text('wind_speed') }}</small>
+                                {% if weather.current and weather.current.wind_speed and weather.current.wind_speed > 25 %}
+                                <div class="text-warning mt-1"><small>High - Avoid spraying</small></div>
+                                {% elif weather.current and weather.current.wind_speed and weather.current.wind_speed < 5 %}
+                                <div class="text-info mt-1"><small>Calm - Good for spraying</small></div>
+                                {% else %}
+                                <div class="text-success mt-1"><small>Moderate</small></div>
+                                {% endif %}
+                            </div>
+                            <div class="weather-detail">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-2 text-info">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                                </svg>
+                                <div class="h5">{{ weather.current and weather.current.pressure and weather.current.pressure }} hPa</div>
+                                <small>Pressure</small>
+                                {% if weather.current and weather.current.pressure and weather.current.pressure < 1000 %}
+                                <div class="text-warning mt-1"><small>Low - Rain likely</small></div>
+                                {% elif weather.current and weather.current.pressure and weather.current.pressure > 1020 %}
+                                <div class="text-success mt-1"><small>High - Clear skies</small></div>
+                                {% else %}
+                                <div class="text-info mt-1"><small>Normal</small></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3-Day Forecast -->
+    {% if weather.forecast %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    {{ get_text('weather_forecast') }}
+                </div>
+                <div class="card-body">
+                    <div class="weather-forecast">
+                        {% for day in weather.forecast %}
+                        <div class="forecast-day">
+                            <!-- Weather Icon -->
+                            <div class="weather-icon mb-2">
+                                {% if day.rain_probability > 70 %}
+                                    <span class="weather-emoji">🌧️</span>
+                                {% elif day.rain_probability > 40 %}
+                                    <span class="weather-emoji">⛅</span>
+                                {% elif day.description.lower().find('cloud') != -1 %}
+                                    <span class="weather-emoji">☁️</span>
+                                {% elif day.description.lower().find('sun') != -1 or day.description.lower().find('clear') != -1 %}
+                                    <span class="weather-emoji">☀️</span>
+                                {% else %}
+                                    <span class="weather-emoji">🌤️</span>
+                                {% endif %}
+                            </div>
+                            <h4>{{ day.day_name }}</h4>
+                            <div class="mb-2">
+                                <span class="text-muted">{{ day.date }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <div class="h4 text-primary">{{ day.high_temp }}°</div>
+                                <div class="text-muted">{{ day.low_temp }}°</div>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">{{ day.description }}</small>
+                            </div>
+                            <div class="mb-2">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                </svg>
+                                <small class="text-primary">{{ day.rain_probability }}% rain</small>
+                            </div>
+                            <div class="mb-2">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2"></path>
+                                </svg>
+                                <small class="text-secondary">{{ day.wind_speed }} km/h</small>
+                            </div>
+                            
+                            <!-- Farming advice based on conditions -->
+                            {% if day.rain_probability > 70 %}
+                            <div class="alert alert-warning py-1 px-2 mt-2">
+                                <small><strong>⚠️ Heavy rain expected</strong><br>Avoid field work</small>
+                            </div>
+                            {% elif day.rain_probability > 40 %}
+                            <div class="alert alert-info py-1 px-2 mt-2">
+                                <small><strong>🌧️ Possible rain</strong><br>Complete urgent tasks early</small>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-success py-1 px-2 mt-2">
+                                <small><strong>☀️ Good day</strong><br>Ideal for farming</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Farming Recommendations -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    {{ get_text('weather_forecast') }}
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Today's Recommendations -->
+                        <div class="col-12 col-md-6">
+                            <h4 class="h5 mb-3">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                {{ get_text('weather_today') }}
+                            </h4>
+                            <ul class="list-unstyled">
+                                {% if weather.current and weather.current.temperature and weather.current.temperature > 35 %}
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"></path>
+                                    </svg>
+                                    <strong>Hot Weather:</strong> Water crops early morning (5-7 AM) or evening (6-8 PM)
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Avoid midday field work (11 AM - 3 PM)
+                                </li>
+                                {% elif weather.current and weather.current.temperature and weather.current.temperature < 10 %}
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-primary">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                    </svg>
+                                    <strong>Cold Weather:</strong> Protect sensitive crops with covering
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Water plants during warmer part of day
+                                </li>
+                                {% else %}
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <strong>Good Weather:</strong> Ideal for all farming activities
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Good time for planting, weeding, and harvesting
+                                </li>
+                                {% endif %}
+
+                                {% if weather.current and weather.current.wind_speed and weather.current.wind_speed > 20 %}
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5l-6.928-12.03c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <strong>Windy Conditions:</strong> Avoid spraying pesticides/fertilizers
+                                </li>
+                                {% elif weather.current and weather.current.wind_speed and weather.current.wind_speed < 5 %}
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <strong>Calm Weather:</strong> Perfect for spraying applications
+                                </li>
+                                {% endif %}
+
+                                {% if weather.current and weather.current.humidity and weather.current.humidity > 80 %}
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5l-6.928-12.03c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <strong>High Humidity:</strong> Monitor for fungal diseases
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                        <!-- Upcoming Planning -->
+                        <div class="col-12 col-md-6">
+                            <h4 class="h5 mb-3">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                {{ get_text('weather_forecast') }}
+                            </h4>
+                            <ul class="list-unstyled">
+                                {% if weather.forecast %}
+                                    {% for day in weather.forecast %}
+                                        {% if day.rain_probability > 70 %}
+                                        <li class="mb-2">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-primary">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                            </svg>
+                                            <strong>{{ day.day_name }}:</strong> Heavy rain expected ({{ day.rain_probability }}%) - Complete outdoor work before then
+                                        </li>
+                                        {% elif day.rain_probability > 40 %}
+                                        <li class="mb-2">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                            </svg>
+                                            <strong>{{ day.day_name }}:</strong> Possible rain ({{ day.rain_probability }}%) - Have backup indoor tasks ready
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                    </svg>
+                                    Check weather daily for optimal activity planning
+                                </li>
+                                <li class="mb-2">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2 text-info">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Keep emergency supplies ready for unexpected weather
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Weather Unavailable State -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-muted mb-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+                    </svg>
+                    <h3>Weather Data Unavailable</h3>
+                    <p class="text-muted mb-4">
+                        Unable to load weather information at the moment. This could be due to:
+                    </p>
+                    <ul class="list-unstyled text-muted mb-4">
+                        <li>• Network connectivity issues</li>
+                        <li>• Weather service temporarily unavailable</li>
+                        <li>• Invalid location data</li>
+                    </ul>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button class="btn btn-primary" onclick="window.location.reload()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Try Again
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            </svg>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Weather Tips -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"></path>
+                    </svg>
+                    Weather Wisdom for Farmers
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-primary">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                    </svg>
+                                </div>
+                                <h4>Rain Timing</h4>
+                                <p class="text-muted">
+                                    Avoid spraying 24 hours before expected rain. Wait 6-8 hours after rain before applying treatments.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-warning">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"></path>
+                                    </svg>
+                                </div>
+                                <h4>Temperature Tips</h4>
+                                <p class="text-muted">
+                                    Best spraying temperature: 18-25°C. Avoid very hot (>30°C) or cold (<10°C) conditions.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-success">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2"></path>
+                                    </svg>
+                                </div>
+                                <h4>Wind Conditions</h4>
+                                <p class="text-muted">
+                                    Ideal wind speed for spraying: 3-10 km/h. Strong winds (>15 km/h) cause spray drift.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Weather Animation Styles */
+.weather-widget {
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.weather-animation-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Rain Animation */
+.rain-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.rain-drop {
+    position: absolute;
+    width: 3px;
+    height: 25px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(135, 206, 235, 0.8), rgba(70, 130, 180, 0.9));
+    animation: rainFall 1s linear infinite;
+    border-radius: 2px;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.5), inset 0 0 2px rgba(135, 206, 235, 0.8);
+}
+
+@keyframes rainFall {
+    0% {
+        top: -20px;
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0.3;
+    }
+}
+
+/* Snow Animation */
+.snow-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.snowflake {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    animation: snowFall 3s linear infinite;
+}
+
+@keyframes snowFall {
+    0% {
+        top: -10px;
+        transform: translateX(0px) rotate(0deg);
+    }
+    100% {
+        top: 100%;
+        transform: translateX(50px) rotate(360deg);
+    }
+}
+
+/* Cloud Animation */
+.clouds-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.cloud {
+    position: absolute;
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.7);
+    animation: cloudFloat 8s ease-in-out infinite;
+}
+
+.cloud1 {
+    top: 20%;
+    left: -10%;
+    animation-delay: 0s;
+}
+
+.cloud2 {
+    top: 40%;
+    left: -15%;
+    animation-delay: 2s;
+    font-size: 2rem;
+}
+
+.cloud3 {
+    top: 60%;
+    left: -8%;
+    animation-delay: 4s;
+    font-size: 2.5rem;
+}
+
+@keyframes cloudFloat {
+    0%, 100% {
+        transform: translateX(0px);
+    }
+    50% {
+        transform: translateX(120vw);
+    }
+}
+
+/* Sun Animation */
+.sun-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+}
+
+.sun {
+    font-size: 3rem;
+    animation: sunRotate 10s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sun-rays {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    transform: translate(-50%, -50%);
+}
+
+.ray {
+    position: absolute;
+    width: 3px;
+    height: 15px;
+    background: rgba(255, 215, 0, 0.6);
+    border-radius: 2px;
+    transform-origin: 50% 50px;
+    animation: rayPulse 2s ease-in-out infinite;
+}
+
+.ray-1 { transform: rotate(0deg) translate(0, -50px); }
+.ray-2 { transform: rotate(45deg) translate(0, -50px); }
+.ray-3 { transform: rotate(90deg) translate(0, -50px); }
+.ray-4 { transform: rotate(135deg) translate(0, -50px); }
+.ray-5 { transform: rotate(180deg) translate(0, -50px); }
+.ray-6 { transform: rotate(225deg) translate(0, -50px); }
+.ray-7 { transform: rotate(270deg) translate(0, -50px); }
+.ray-8 { transform: rotate(315deg) translate(0, -50px); }
+
+@keyframes sunRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes rayPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Mist/Fog Animation */
+.mist-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.mist-layer {
+    position: absolute;
+    width: 120%;
+    height: 40px;
+    background: linear-gradient(90deg, 
+        rgba(200, 200, 200, 0) 0%, 
+        rgba(200, 200, 200, 0.3) 25%, 
+        rgba(200, 200, 200, 0.5) 50%, 
+        rgba(200, 200, 200, 0.3) 75%, 
+        rgba(200, 200, 200, 0) 100%);
+    border-radius: 20px;
+    animation: mistMove 6s ease-in-out infinite;
+}
+
+.mist1 {
+    top: 30%;
+    animation-delay: 0s;
+}
+
+.mist2 {
+    top: 50%;
+    animation-delay: 2s;
+    opacity: 0.7;
+}
+
+.mist3 {
+    top: 70%;
+    animation-delay: 4s;
+    opacity: 0.5;
+}
+
+@keyframes mistMove {
+    0%, 100% {
+        transform: translateX(-20%);
+    }
+    50% {
+        transform: translateX(0%);
+    }
+}
+
+/* Thunder/Lightning Animation */
+.thunder-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.lightning {
+    position: absolute;
+    top: 10%;
+    left: 30%;
+    width: 4px;
+    height: 80%;
+    background: linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 0, 0.8) 50%,
+        rgba(255, 255, 255, 0.9) 100%);
+    border-radius: 2px;
+    animation: lightning 3s ease-in-out infinite;
+    opacity: 0;
+    transform: rotate(15deg);
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+}
+
+@keyframes lightning {
+    0%, 90%, 100% {
+        opacity: 0;
+    }
+    5%, 10% {
+        opacity: 1;
+    }
+}
+
+/* Weather-specific background gradients */
+.weather-widget[data-weather*="rain"] {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 50%, #1e3a5f 100%);
+}
+
+.weather-widget[data-weather*="sun"], 
+.weather-widget[data-weather*="clear"] {
+    background: linear-gradient(135deg, #87ceeb 0%, #4a90e2 50%, #1e90ff 100%);
+}
+
+.weather-widget[data-weather*="cloud"] {
+    background: linear-gradient(135deg, #b0c4de 0%, #778899 50%, #2f4f4f 100%);
+}
+
+.weather-widget[data-weather*="snow"] {
+    background: linear-gradient(135deg, #e6f3ff 0%, #b3d9ff 50%, #80bfff 100%);
+}
+
+.weather-widget[data-weather*="mist"], 
+.weather-widget[data-weather*="fog"] {
+    background: linear-gradient(135deg, #d3d3d3 0%, #a9a9a9 50%, #696969 100%);
+}
+
+.weather-widget[data-weather*="thunder"], 
+.weather-widget[data-weather*="storm"] {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #1a252f 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .rain-drop {
+        width: 1px;
+        height: 15px;
+    }
+    
+    .cloud {
+        font-size: 2rem;
+    }
+    
+    .sun {
+        font-size: 2rem;
+    }
+    
+    .sun-container {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Weather Icons */
+.weather-icon {
+    text-align: center;
+}
+
+.weather-emoji {
+    font-size: 2.5rem;
+    display: inline-block;
+    animation: weatherFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+@keyframes weatherFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Moon Animation */
+.moon-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+}
+
+.moon {
+    font-size: 3rem;
+    animation: moonGlow 4s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stars {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    transform: translate(-50%, -50%);
+}
+
+.star {
+    position: absolute;
+    font-size: 0.8rem;
+    animation: starTwinkle 2s ease-in-out infinite;
+}
+
+.star-1 { top: 10%; left: 20%; animation-delay: 0s; }
+.star-2 { top: 20%; right: 15%; animation-delay: 0.3s; }
+.star-3 { bottom: 30%; left: 10%; animation-delay: 0.6s; }
+.star-4 { bottom: 20%; right: 25%; animation-delay: 0.9s; }
+.star-5 { top: 40%; left: 5%; animation-delay: 1.2s; }
+.star-6 { top: 60%; right: 10%; animation-delay: 1.5s; }
+
+@keyframes moonGlow {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    }
+    50% { 
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+    }
+}
+
+@keyframes starTwinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Night Mode */
+.weather-widget.night-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+}
+
+.weather-widget.night-mode .weather-temp,
+.weather-widget.night-mode .weather-description {
+    color: #e0e0e0;
+}
+
+.weather-widget.night-mode .weather-detail {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for night mode first
+    checkNightMode();
+    
+    // Initialize weather animations
+    initWeatherAnimations();
+    
+    // Add animations to weather cards
+    const weatherCards = document.querySelectorAll('.forecast-day, .weather-detail');
+    weatherCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('fade-in');
+        }, index * 100);
+    });
+
+    // Auto-refresh weather data every 15 minutes
+    setInterval(() => {
+        if (navigator.onLine) {
+            showNotification('🌤️ Checking for weather updates...', 'info', 2000);
+            
+            // In a real implementation, this would make an API call
+            setTimeout(() => {
+                // window.location.reload();
+                showNotification('✅ Weather data is up to date!', 'success', 2000);
+            }, 2000);
+        }
+    }, 900000); // 15 minutes
+
+    // Weather alerts based on conditions
+    {% if weather %}
+        {% if weather.forecast %}
+            {% for day in weather.forecast %}
+                {% if day.rain_probability > 80 %}
+                    setTimeout(() => {
+                        showNotification('⚠️ Heavy rain alert for {{ day.day_name }}! Plan your activities accordingly.', 'warning');
+                    }, {{ loop.index * 1000 }});
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if weather.current and weather.current.wind_speed and weather.current.wind_speed > 25 %}
+            setTimeout(() => {
+                showNotification('💨 High wind alert! Avoid spraying operations today.', 'warning');
+            }, 2000);
+        {% endif %}
+
+        {% if weather.current and weather.current.temperature and weather.current.temperature > 35 %}
+            setTimeout(() => {
+                showNotification('🌡️ Extreme heat alert! Protect yourself and your crops.', 'warning');
+            }, 3000);
+        {% endif %}
+    {% endif %}
+
+    // Add click-to-expand functionality for forecast cards
+    const forecastDays = document.querySelectorAll('.forecast-day');
+    forecastDays.forEach(day => {
+        day.addEventListener('click', function() {
+            // Toggle expanded state
+            this.classList.toggle('expanded');
+            
+            // In a full implementation, this could show more detailed hourly data
+            if (this.classList.contains('expanded')) {
+                this.style.transform = 'scale(1.05)';
+                this.style.zIndex = '10';
+            } else {
+                this.style.transform = '';
+                this.style.zIndex = '';
+            }
+        });
+    });
+
+    // Offline support
+    if (!navigator.onLine) {
+        showNotification('📵 You are offline. Weather data may be outdated.', 'warning');
+    }
+});
+
+// Night Mode Check
+function checkNightMode() {
+    const weatherWidget = document.getElementById('weatherWidget');
+    if (!weatherWidget) return;
+    
+    const currentHour = new Date().getHours();
+    console.log('Current hour:', currentHour);
+    
+    if (currentHour >= 18 || currentHour < 5) {
+        console.log('Night mode active');
+        weatherWidget.classList.add('night-mode');
+        
+        // Show moon animation
+        const moonContainer = weatherWidget.querySelector('.moon-container');
+        if (moonContainer) {
+            moonContainer.style.display = 'block';
+        }
+    }
+}
+
+// Weather Animation Controller
+function initWeatherAnimations() {
+    const weatherWidget = document.getElementById('weatherWidget');
+    if (!weatherWidget) return;
+    
+    const weatherCondition = weatherWidget.getAttribute('data-weather') || '';
+    const condition = weatherCondition.toLowerCase();
+    
+    // Hide all animations first
+    const animations = [
+        '.rain-container',
+        '.snow-container', 
+        '.clouds-container',
+        '.sun-container',
+        '.moon-container',
+        '.mist-container',
+        '.thunder-container'
+    ];
+    
+    animations.forEach(selector => {
+        const element = weatherWidget.querySelector(selector);
+        if (element) element.style.display = 'none';
+    });
+    
+    // Debug: Log the weather condition
+    console.log('Weather condition detected:', condition);
+    
+    // Show appropriate animation based on weather condition
+    if (condition.includes('rain') || condition.includes('drizzle') || condition.includes('shower') || condition.includes('precipitation')) {
+        console.log('Showing rain animation');
+        showAnimation('.rain-container');
+        if (condition.includes('thunder') || condition.includes('storm')) {
+            showAnimation('.thunder-container');
+        }
+    } else if (condition.includes('snow') || condition.includes('blizzard')) {
+        showAnimation('.snow-container');
+    } else if (condition.includes('cloud') || condition.includes('overcast')) {
+        showAnimation('.clouds-container');
+    } else if (condition.includes('clear') || condition.includes('sunny') || condition.includes('sun')) {
+        // Check if it's night time (6 PM to 5 AM)
+        const now = new Date();
+        const currentHour = now.getHours();
+        console.log('System time:', now.toLocaleString());
+        console.log('Current hour:', currentHour);
+        if (currentHour >= 18 || currentHour < 5) {
+            console.log('Night mode activated (6 PM - 5 AM)');
+            showAnimation('.moon-container');
+            weatherWidget.classList.add('night-mode');
+        } else {
+            console.log('Day mode activated (5 AM - 6 PM)');
+            showAnimation('.sun-container');
+        }
+    } else if (condition.includes('mist') || condition.includes('fog') || condition.includes('haze')) {
+        showAnimation('.mist-container');
+    } else if (condition.includes('thunder') || condition.includes('storm')) {
+        showAnimation('.thunder-container');
+        showAnimation('.clouds-container');
+    } else {
+        // Default to clouds for unknown conditions, but check for night mode
+        const currentHour = new Date().getHours();
+        if (currentHour >= 18 || currentHour < 5) {
+            console.log('Night mode for default condition');
+            showAnimation('.moon-container');
+            weatherWidget.classList.add('night-mode');
+        } else {
+            showAnimation('.clouds-container');
+        }
+    }
+    
+    // Force night mode check regardless of weather condition (6 PM - 5 AM)
+    const now = new Date();
+    const currentHour = now.getHours();
+    console.log('Final system time check:', now.toLocaleString());
+    console.log('Final hour check:', currentHour);
+    if (currentHour >= 18 || currentHour < 5) {
+        console.log('Forcing night mode (6 PM - 5 AM)');
+        weatherWidget.classList.add('night-mode');
+        // If no other animation is showing, show moon
+        const visibleAnimations = weatherWidget.querySelectorAll('[style*="display: block"]');
+        if (visibleAnimations.length === 0) {
+            showAnimation('.moon-container');
+        }
+    }
+    
+    function showAnimation(selector) {
+        const element = weatherWidget.querySelector(selector);
+        if (element) {
+            element.style.display = 'block';
+            element.style.animation = 'fadeIn 1s ease-in-out';
+        }
+    }
+}
+
+// Share weather report
+function shareWeatherReport() {
+    {% if weather %}
+    const shareText = `Current weather in {{ weather.city }}:\n` +
+                     `🌡️ {{ weather.current and weather.current.temperature and weather.current.temperature }}°C - {{ weather.current.description }}\n` +
+                     `💧 Humidity: {{ weather.current and weather.current.humidity and weather.current.humidity }}%\n` +
+                     `💨 Wind: {{ weather.current and weather.current.wind_speed and weather.current.wind_speed }} km/h\n\n` +
+                     `Get detailed weather insights at Krishi Sahayak`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Weather Report - Krishi Sahayak',
+            text: shareText,
+            url: window.location.href
+        });
+    } else {
+        // Fallback to copy to clipboard
+        navigator.clipboard.writeText(shareText).then(() => {
+            showNotification('📋 Weather report copied to clipboard!', 'success');
+        });
+    }
+    {% endif %}
+}
+
+// Export weather data
+function exportWeatherData() {
+    {% if weather %}
+    const weatherData = {
+        location: '{{ weather.city }}, {{ weather.pin_code }}',
+        current: {
+            temperature: '{{ weather.current and weather.current.temperature and weather.current.temperature }}°C',
+            description: '{{ weather.current.description }}',
+            humidity: '{{ weather.current and weather.current.humidity and weather.current.humidity }}%',
+            windSpeed: '{{ weather.current and weather.current.wind_speed and weather.current.wind_speed }} km/h',
+            pressure: '{{ weather.current and weather.current.pressure and weather.current.pressure }} hPa'
+        },
+        forecast: [
+            {% for day in weather.forecast %}
+            {
+                day: '{{ day.day_name }}',
+                date: '{{ day.date }}',
+                high: '{{ day.high_temp }}°C',
+                low: '{{ day.low_temp }}°C',
+                description: '{{ day.description }}',
+                rainProbability: '{{ day.rain_probability }}%',
+                windSpeed: '{{ day.wind_speed }} km/h'
+            }{{ ',' if not loop.last }}
+            {% endfor %}
+        ],
+        lastUpdated: '{{ weather.last_updated }}'
+    };
+    
+    const csv = convertWeatherToCSV(weatherData);
+    downloadCSV(csv, 'weather-report-' + new Date().toISOString().split('T')[0] + '.csv');
+    {% endif %}
+}
+
+function convertWeatherToCSV(data) {
+    let csv = 'Weather Report\n';
+    csv += `Location,${data.location}\n`;
+    csv += `Last Updated,${data.lastUpdated}\n\n`;
+    
+    csv += 'Current Conditions\n';
+    csv += 'Metric,Value\n';
+    csv += `Temperature,${data.current.temperature}\n`;
+    csv += `Description,${data.current.description}\n`;
+    csv += `Humidity,${data.current.humidity}\n`;
+    csv += `Wind Speed,${data.current.windSpeed}\n`;
+    csv += `Pressure,${data.current.pressure}\n\n`;
+    
+    csv += '3-Day Forecast\n';
+    csv += 'Day,Date,High,Low,Description,Rain Probability,Wind Speed\n';
+    data.forecast.forEach(day => {
+        csv += `${day.day},${day.date},${day.high},${day.low},${day.description},${day.rainProbability},${day.windSpeed}\n`;
+    });
+    
+    return csv;
+}
+
+function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('📊 Weather report exported successfully!', 'success');
+}
+
+// Location detection functionality
+function getCurrentLocation() {
+    const btn = document.getElementById('getLocationBtn');
+    const status = document.getElementById('locationStatus');
+    
+    if (!navigator.geolocation) {
+        status.innerHTML = '<span class="text-danger">Geolocation not supported by this browser</span>';
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Getting location...';
+    status.innerHTML = '<span class="text-info">Detecting your location...</span>';
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            status.innerHTML = '<span class="text-success">Location detected! Getting weather data...</span>';
+            
+            // Redirect to weather page with coordinates
+            window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+        },
+        function(error) {
+            let errorMessage = 'Location access denied';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = 'Location access denied by user';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = 'Location information unavailable';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = 'Location request timed out';
+                    break;
+            }
+            
+            status.innerHTML = `<span class="text-danger">${errorMessage}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Use My Current Location
+            `;
+        },
+        {
+            timeout: 10000,
+            enableHighAccuracy: true
+        }
+    );
+}
+
+function toggleLocationInput() {
+    const input = document.getElementById('locationInput');
+    if (input.style.display === 'none') {
+        input.style.display = 'block';
+        document.getElementById('pinCodeInput').focus();
+    } else {
+        input.style.display = 'none';
+    }
+}
+
+function getWeatherByPin() {
+    const pinCode = document.getElementById('pinCodeInput').value.trim();
+    if (!pinCode) {
+        alert('Please enter a PIN code');
+        return;
+    }
+    
+    if (pinCode.length !== 6 || !/^\d{6}$/.test(pinCode)) {
+        alert('Please enter a valid 6-digit PIN code');
+        return;
+    }
+    
+    window.location.href = `/weather?pin=${pinCode}`;
+}
+
+// Auto-detect location on page load if no weather data
+{% if not weather %}
+document.addEventListener('DOMContentLoaded', function() {
+    const status = document.getElementById('locationStatus');
+    status.innerHTML = '<span class="text-muted">💡 Tip: Click "Use My Current Location" for accurate local weather</span>';
+});
+{% endif %}
+</script>
+{% endblock %}

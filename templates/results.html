@@ -1,0 +1,1851 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Results - Krishi Sahayak{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <!-- Enhanced Header with Animation -->
+            <div class="results-header text-center mb-4 stagger-child" data-animation="fadeInUp" data-delay="100">
+                <div class="success-animation mb-3">
+                    <div class="success-circle">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="success-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="results-title mb-3">
+                    🎯 Analysis Complete
+                </h1>
+                <div class="analysis-meta">
+                    <span class="analysis-badge">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ moment().strftime('%B %d, %Y at %I:%M %p') if moment else 'Just now' }}
+                    </span>
+                    <span class="ai-badge">
+                        🤖 AI Powered Analysis
+                    </span>
+                </div>
+            </div>
+
+            <!-- Enhanced Weather Warning -->
+            {% if result.weather_warning %}
+            <div class="weather-alert-card mb-4 stagger-child" data-animation="slideUp" data-delay="200">
+                <div class="alert-icon-container">
+                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="alert-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5l-6.928-12.03c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="alert-content">
+                    <h4 class="alert-title">🌦️ Weather Alert</h4>
+                    <p class="alert-message">{{ result.weather_warning }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Enhanced Diagnosis Section -->
+            <div class="diagnosis-card mb-4 stagger-child" data-animation="fadeInUp" data-delay="300">
+                <div class="card-header-enhanced">
+                    <div class="header-icon-container">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="header-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="header-content">
+                        <h3 class="header-title">🤖 AI Plant Doctor Diagnosis</h3>
+                        <p class="header-subtitle">Advanced computer vision analysis</p>
+                    </div>
+                </div>
+                <div class="card-body-enhanced">
+                    <div class="diagnosis-container">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-lg-8">
+                                <div class="diagnosis-content">
+                                    <div class="diagnosis-text">
+                                        {{ result.diagnosis | safe }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-4">
+                                {% if result.image_filename %}
+                                <div class="image-container">
+                                    <div class="image-frame">
+                                        <img 
+                                            src="{{ url_for('static', filename='uploads/' + result.image_filename) }}" 
+                                            alt="Analyzed plant image" 
+                                            class="analyzed-image"
+                                            onerror="this.style.display='none'"
+                                        >
+                                        <div class="image-overlay">
+                                            <span class="scan-badge">🔍 Scanned</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Treatment Advice -->
+            <div class="treatment-card mb-4 stagger-child" data-animation="fadeInUp" data-delay="400">
+                <div class="card-header-enhanced treatment-header">
+                    <div class="header-icon-container">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="header-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                    </div>
+                    <div class="header-content">
+                        <h3 class="header-title">📊 Treatment Recommendations</h3>
+                        <p class="header-subtitle">Expert-guided solutions for your crop</p>
+                    </div>
+                </div>
+                <div class="card-body-enhanced">
+                    <div class="treatment-container">
+                        <div class="treatment-advice" id="treatmentContent">
+                            {{ result.treatment_advice | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simple Action Buttons -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    ⚡ Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <a href="{{ url_for('scanner') }}" class="btn btn-success w-100" style="min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                📷 Scan Another Plant
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <a href="{{ url_for('weather') }}" class="btn btn-primary w-100" style="min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                                </svg>
+                                🌦️ Check Weather
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-warning w-100" style="min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                                </svg>
+                                🏠 Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced AI Assistant Section -->
+            <div class="ai-assistant-results-enhanced mb-4 stagger-child" data-animation="fadeInUp" data-delay="600">
+                <div class="assistant-header-enhanced">
+                    <div class="assistant-icon-container">
+                        <div class="ai-avatar">
+                            🤖
+                        </div>
+                        <div class="pulse-rings">
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring"></div>
+                        </div>
+                    </div>
+                    <div class="assistant-title-section">
+                        <h3 class="assistant-title">🗣️ आपका AI प्लांट डॉक्टर</h3>
+                        <p class="assistant-subtitle">बोलकर अपनी खेती की समस्या पूछें - हिंदी या अंग्रेजी में!</p>
+                    </div>
+                </div>
+                <div class="assistant-body-enhanced">
+                    <div class="ai-assistant-results">
+                        <div class="assistant-header-results">
+                            <p class="mb-2">🗣️ <strong>AI प्लांट डॉक्टर से बात करें!</strong></p>
+                            <p class="mb-3">बोलकर अपनी खेती की समस्या पूछें - हिंदी या अंग्रेजी में!</p>
+                            <div class="example-queries mb-3">
+                                <small class="text-muted">उदाहरण: "इस पौधे की क्या समस्या है?", "इलाज कैसे करें?", "कब छिड़काव करें?"</small>
+                            </div>
+                        </div>
+                        
+                        <div class="assistant-controls-results">
+                            <button id="voice-button-results" class="btn btn-success btn-lg voice-btn-results me-3" onclick="startVoiceInputResults()">
+                                <span id="voice-icon-results">🗣️</span>
+                                <span id="voice-text-results">बोलिए</span>
+                            </button>
+                            
+                            <button id="language-toggle-results" class="btn btn-outline-success" onclick="toggleLanguageResults()">हिं</button>
+                        </div>
+                        
+                        <!-- Animations -->
+                        <div id="listening-animation-results" class="listening-wave-results mt-3" style="display: none;">
+                            <div class="wave-results"></div>
+                            <div class="wave-results"></div>
+                            <div class="wave-results"></div>
+                        </div>
+                        
+                        <div id="processing-animation-results" class="processing-spinner-results mt-3" style="display: none;">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Processing...</span>
+                            </div>
+                            <span class="ms-2">AI विश्लेषण कर रहा है...</span>
+                        </div>
+                        
+                        <!-- Voice Response -->
+                        <div id="voice-response-results" class="voice-response-results mt-4" style="display: none;"></div>
+                        
+                        <!-- Quick Questions -->
+                        <div id="quickQuestions-results" class="mb-3 mt-4">
+                            <p class="small text-muted mb-2">🗣️ Try saying: "इस पौधे की क्या समस्या है?" or click:</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestionResults('इस पौधे की क्या समस्या है?')">🌱 Plant problem</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestionResults('इलाज कितनी बार करना है?')">💊 Treatment frequency</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestionResults('नीम का तेल इस्तेमाल कर सकते हैं?')">🌿 Neem oil use</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestionResults('समस्या बढ़ जाए तो क्या करें?')">⚠️ If worse</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestionResults('इलाज का सबसे अच्छा समय?')">⏰ Best time</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="askQuickQuestionResults('कितने दिन में ठीक होगा?')">📅 Recovery time</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Text Input Fallback -->
+                        <div class="text-input-fallback mt-3">
+                            <div class="mb-3">
+                                <textarea id="questionText-results" class="form-control" rows="2" placeholder="अपना सवाल यहाँ लिखें... (जैसे: 'इस पौधे की क्या समस्या है?' या 'इलाज कैसे करें?')"></textarea>
+                            </div>
+                            <button class="btn btn-success w-100" onclick="askQuestionResults()">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                                🤖 AI डॉक्टर से पूछें
+                            </button>
+                        </div>
+                        
+                        <!-- Chat History -->
+                        <div id="chatHistory-results" style="max-height: 300px; overflow-y: auto; display: none;">
+                            <hr>
+                            <h6>💬 Conversation:</h6>
+                            <div id="chatMessages-results"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save/Share Options -->
+            <div class="card">
+                <div class="card-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                </svg>
+                Save & Share
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6">
+                        <button class="btn btn-success w-100" onclick="saveResult()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            Save to Phone
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <button class="btn btn-info w-100" onclick="shareResult()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                            Share with Others
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print-friendly version (hidden) -->
+<div id="printable-result" style="display: none;">
+    <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <h1 style="color: #2d5016; text-align: center;">🌱 Krishi Sahayak - Plant Analysis Report</h1>
+        <hr>
+        <h2>Diagnosis:</h2>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            {{ result.diagnosis }}
+        </div>
+        
+        <h2>Treatment Recommendations:</h2>
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            {{ result.treatment_advice }}
+        </div>
+        
+        {% if result.weather_warning %}
+        <h2>Weather Alert:</h2>
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            {{ result.weather_warning }}
+        </div>
+        {% endif %}
+        
+        <p style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
+            Generated on {{ moment().strftime('%B %d, %Y at %I:%M %p') if moment else 'Just now' }} by Krishi Sahayak AI
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Force Light Mode - Override System Dark Mode */
+html {
+    color-scheme: light !important;
+}
+
+body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    color: #2d5016 !important;
+}
+
+/* Override any dark mode styles */
+@media (prefers-color-scheme: dark) {
+    html {
+        color-scheme: light !important;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+        color: #2d5016 !important;
+    }
+    
+    .card {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #2d5016 !important;
+    }
+    
+    .form-control {
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #2d5016 !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .text-muted {
+        color: #6b7280 !important;
+    }
+}
+
+/* Enhanced Results Page Styles */
+
+/* Global link reset for results page */
+.container a {
+    text-decoration: none !important;
+}
+
+.container a:hover,
+.container a:visited,
+.container a:active,
+.container a:focus {
+    text-decoration: none !important;
+}
+
+/* Specific override for action buttons */
+.action-btn-enhanced,
+.action-btn-enhanced:hover,
+.action-btn-enhanced:visited,
+.action-btn-enhanced:active,
+.action-btn-enhanced:focus {
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+
+.action-btn-enhanced h5,
+.action-btn-enhanced p {
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+
+/* Results Header */
+.results-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.success-animation {
+    position: relative;
+    display: inline-block;
+}
+
+.success-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #10b981 0%, #16a34a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    animation: successPulse 2s ease-in-out infinite;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+.success-icon {
+    color: white;
+    animation: checkmark 0.8s ease-in-out;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0) rotate(45deg); }
+    50% { transform: scale(1.2) rotate(45deg); }
+    100% { transform: scale(1) rotate(45deg); }
+}
+
+.results-title {
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.analysis-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.analysis-badge, .ai-badge {
+    background: rgba(45, 80, 22, 0.1);
+    color: #2d5016;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 2px solid rgba(45, 80, 22, 0.2);
+    display: flex;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+/* Weather Alert Card */
+.weather-alert-card {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+    animation: alertPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+    0%, 100% { box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3); }
+    50% { box-shadow: 0 12px 35px rgba(251, 191, 36, 0.5); }
+}
+
+.alert-icon-container {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+.alert-icon {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.alert-title {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.alert-message {
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Enhanced Card Styles */
+.diagnosis-card, .treatment-card, .save-share-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+}
+
+.diagnosis-card:hover, .treatment-card:hover, .save-share-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header-enhanced {
+    background: linear-gradient(135deg, #a7c957 0%, #7fb069 100%);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header-enhanced::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.treatment-header {
+    background: linear-gradient(135deg, #16a34a 0%, #10b981 100%);
+}
+
+.share-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.header-icon-container {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 0.75rem;
+    backdrop-filter: blur(10px);
+}
+
+.header-icon {
+    animation: float 3s ease-in-out infinite;
+}
+
+.header-content {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+}
+
+.header-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.header-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.card-body-enhanced {
+    padding: 2rem;
+}
+
+/* Treatment Advice Styles */
+.treatment-advice {
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.treatment-advice h3,
+.treatment-advice h4 {
+    color: #2d5016;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.treatment-advice ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.treatment-advice li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.treatment-advice .emoji-section {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.treatment-advice .section-header {
+    font-weight: 600;
+    color: #2d5016;
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Image Container */
+.image-container {
+    text-align: center;
+}
+
+.image-frame {
+    position: relative;
+    display: inline-block;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.image-frame:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.analyzed-image {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    border-radius: 16px;
+    display: block;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.scan-badge {
+    background: rgba(16, 185, 129, 0.9);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+/* Action Buttons Section */
+.action-buttons-section {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(226, 232, 240, 0.8) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.action-buttons-section a {
+    text-decoration: none !important;
+}
+
+.action-buttons-section a:hover {
+    text-decoration: none !important;
+}
+
+.action-buttons-section a:visited {
+    text-decoration: none !important;
+}
+
+.action-buttons-section a:active {
+    text-decoration: none !important;
+}
+
+.action-buttons-section a:focus {
+    text-decoration: none !important;
+}
+
+.section-title {
+    color: #2d5016;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Force button styling */
+.action-buttons-grid a {
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+
+.action-buttons-grid a * {
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+
+.action-btn-enhanced {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none !important;
+    color: #2d5016;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.action-btn-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.action-btn-enhanced:hover::before {
+    left: 100%;
+}
+
+.action-btn-enhanced:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    text-decoration: none !important;
+    color: white;
+}
+
+.action-btn-enhanced.primary {
+    border-color: #16a34a;
+}
+
+.action-btn-enhanced.primary:hover {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: white !important;
+}
+
+.action-btn-enhanced.secondary {
+    border-color: #3b82f6;
+}
+
+.action-btn-enhanced.secondary:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white !important;
+}
+
+.action-btn-enhanced.tertiary {
+    border-color: #f59e0b;
+}
+
+.action-btn-enhanced.tertiary:hover {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: white !important;
+}
+
+.btn-icon-container {
+    background: rgba(45, 80, 22, 0.1);
+    border-radius: 50%;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.action-btn-enhanced:hover .btn-icon-container {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-content h5 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.btn-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Ensure no link styling */
+.action-btn-enhanced:link,
+.action-btn-enhanced:visited,
+.action-btn-enhanced:active {
+    text-decoration: none !important;
+    color: #2d5016;
+}
+
+.action-btn-enhanced:hover .btn-content h5,
+.action-btn-enhanced:hover .btn-content p {
+    color: white;
+}
+
+.action-btn-enhanced .btn-content h5 {
+    text-decoration: none !important;
+}
+
+.action-btn-enhanced .btn-content p {
+    text-decoration: none !important;
+}
+
+/* Enhanced AI Assistant */
+.ai-assistant-results-enhanced {
+    background: linear-gradient(135deg, #16a34a 0%, #10b981 50%, #059669 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+    box-shadow: 0 15px 35px rgba(16, 163, 74, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-assistant-results-enhanced::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 4s ease-in-out infinite;
+}
+
+.assistant-header-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.assistant-icon-container {
+    position: relative;
+}
+
+.ai-avatar {
+    font-size: 3rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 2;
+}
+
+.pulse-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pulse-ring {
+    position: absolute;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: pulse-ring 2s ease-out infinite;
+}
+
+.pulse-ring:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    margin: -50px 0 0 -50px;
+    animation-delay: 0s;
+}
+
+.pulse-ring:nth-child(2) {
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    animation-delay: 0.5s;
+}
+
+.pulse-ring:nth-child(3) {
+    width: 140px;
+    height: 140px;
+    margin: -70px 0 0 -70px;
+    animation-delay: 1s;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+}
+
+.assistant-title-section {
+    flex: 1;
+}
+
+.assistant-title {
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.assistant-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 1rem;
+}
+
+.assistant-body-enhanced {
+    position: relative;
+    z-index: 2;
+}
+
+/* Animations */
+@keyframes shimmer {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+    40%, 43% { transform: translate3d(0,-15px,0); }
+    70% { transform: translate3d(0,-7px,0); }
+    90% { transform: translate3d(0,-2px,0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .results-title {
+        font-size: 2rem;
+    }
+    
+    .analysis-meta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .weather-alert-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .card-header-enhanced {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .assistant-header-enhanced {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .action-buttons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-btn-enhanced {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .results-header {
+        padding: 1.5rem;
+    }
+    
+    .card-body-enhanced {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons-section {
+        padding: 1.5rem;
+    }
+    
+    .ai-assistant-results-enhanced {
+        padding: 1.5rem;
+    }
+}
+
+/* AI Assistant Styles for Results Page */
+.ai-assistant-results {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 15px;
+    padding: 25px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-assistant-results::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer-results 3s ease-in-out infinite;
+}
+
+@keyframes shimmer-results {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+.assistant-header-results p {
+    color: rgba(255,255,255,0.95);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.assistant-controls-results {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 15px;
+}
+
+.voice-btn-results {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.voice-btn-results:hover {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.voice-btn-results.listening {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    border-color: #ff6b6b;
+    animation: pulse-results 1.5s infinite;
+}
+
+@keyframes pulse-results {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
+.listening-wave-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.wave-results {
+    width: 10px;
+    height: 35px;
+    background: rgba(255,255,255,0.8);
+    margin: 0 3px;
+    border-radius: 5px;
+    animation: wave-results 1.2s infinite ease-in-out;
+}
+
+.wave-results:nth-child(2) { animation-delay: -1.1s; }
+.wave-results:nth-child(3) { animation-delay: -1.0s; }
+
+@keyframes wave-results {
+    0%, 40%, 100% { transform: scaleY(0.4); }
+    20% { transform: scaleY(1.0); }
+}
+
+.processing-spinner-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.voice-response-results {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid rgba(255,255,255,0.5);
+    text-align: left;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 2;
+}
+
+.voice-conversation {
+    margin-bottom: 15px;
+}
+
+.user-query {
+    background: rgba(255,255,255,0.2);
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+}
+
+.ai-response {
+    background: rgba(255,255,255,0.1);
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.text-input-fallback {
+    position: relative;
+    z-index: 2;
+}
+
+#quickQuestions-results {
+    position: relative;
+    z-index: 2;
+}
+
+#quickQuestions-results .btn {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.3);
+    color: white;
+    font-size: 0.85rem;
+}
+
+#quickQuestions-results .btn:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .ai-assistant-results {
+        padding: 20px;
+        border-radius: 12px;
+    }
+    
+    .assistant-header-results p {
+        font-size: 1rem;
+    }
+    
+    .voice-btn-results {
+        padding: 10px 25px;
+        font-size: 1.1rem;
+    }
+    
+    #quickQuestions-results .btn {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/enhanced-voice-assistant.js') }}"></script>
+<script>
+// Save result functionality
+function saveResult() {
+    if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+        // PWA save functionality
+        const content = document.querySelector('.diagnosis-result').innerHTML + 
+                       document.querySelector('.treatment-advice').innerHTML;
+        
+        const blob = new Blob([content], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'plant-diagnosis-' + new Date().toISOString().split('T')[0] + '.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification('✅ Report saved successfully!', 'success');
+    } else {
+        // Fallback: Print functionality
+        window.print();
+    }
+}
+
+// Share result functionality
+function shareResult() {
+    if (navigator.share) {
+        // Native sharing API
+        const shareText = `Plant Analysis from Krishi Sahayak:\n\n` +
+                         `Diagnosis: {{ result.diagnosis|truncate(100) }}\n\n` +
+                         `Treatment: {{ result.treatment_advice|truncate(100) }}\n\n` +
+                         `Get the full report at: ${window.location.href}`;
+        
+        navigator.share({
+            title: 'Plant Disease Analysis - Krishi Sahayak',
+            text: shareText,
+            url: window.location.href
+        }).then(() => {
+            showNotification('✅ Shared successfully!', 'success');
+        }).catch((error) => {
+            console.log('Error sharing:', error);
+            fallbackShare();
+        });
+    } else {
+        fallbackShare();
+    }
+}
+
+function fallbackShare() {
+    // Fallback sharing options
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('Check out this plant analysis from Krishi Sahayak');
+    
+    // Create sharing modal
+    const modal = document.createElement('div');
+    modal.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center';
+    modal.style.cssText = 'background: rgba(0,0,0,0.5); z-index: 9999;';
+    modal.innerHTML = `
+        <div class="card" style="max-width: 400px; margin: 20px;">
+            <div class="card-header">
+                <h4 class="mb-0">Share this Report</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="https://wa.me/?text=${text}%20${url}" target="_blank" class="btn btn-success">
+                        📱 WhatsApp
+                    </a>
+                    <a href="sms:?body=${text}%20${url}" class="btn btn-primary">
+                        💬 SMS
+                    </a>
+                    <button class="btn btn-info" onclick="copyToClipboard()">
+                        📋 Copy Link
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeModal()">
+                        ❌ Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    window.closeModal = function() {
+        document.body.removeChild(modal);
+    };
+    
+    window.copyToClipboard = function() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showNotification('✅ Link copied to clipboard!', 'success');
+            closeModal();
+        });
+    };
+}
+
+// Format treatment text properly
+function formatTreatmentText() {
+    const treatmentDiv = document.getElementById('treatmentContent');
+    if (!treatmentDiv) return;
+    
+    let content = treatmentDiv.innerHTML;
+    
+    // First, convert all **text** to <strong>text</strong> (including bullet points)
+    content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    
+    // Replace emoji headers with proper formatting (remove colons)
+    content = content.replace(/🔍\s*<strong>([^<]+?):\s*<\/strong>/g, '<div class="emoji-section"><div class="section-header">🔍 $1</div>');
+    content = content.replace(/🌿\s*<strong>([^<]+?):\s*<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">🌿 $1</div>');
+    content = content.replace(/💊\s*<strong>([^<]+?):\s*<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">💊 $1</div>');
+    content = content.replace(/⏰\s*<strong>([^<]+?):\s*<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">⏰ $1</div>');
+    content = content.replace(/🛡️\s*<strong>([^<]+?):\s*<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">🛡️ $1</div>');
+    content = content.replace(/💰\s*<strong>([^<]+?):\s*<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">💰 $1</div>');
+    
+    // Also handle cases without colons
+    content = content.replace(/🔍\s*<strong>([^<]+)<\/strong>/g, '<div class="emoji-section"><div class="section-header">🔍 $1</div>');
+    content = content.replace(/🌿\s*<strong>([^<]+)<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">🌿 $1</div>');
+    content = content.replace(/💊\s*<strong>([^<]+)<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">💊 $1</div>');
+    content = content.replace(/⏰\s*<strong>([^<]+)<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">⏰ $1</div>');
+    content = content.replace(/🛡️\s*<strong>([^<]+)<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">🛡️ $1</div>');
+    content = content.replace(/💰\s*<strong>([^<]+)<\/strong>/g, '</div><div class="emoji-section"><div class="section-header">💰 $1</div>');
+    
+    // Convert bullet points to proper list items
+    content = content.replace(/•\s*([^\n]+)/g, '<li>$1</li>');
+    
+    // Wrap consecutive list items in ul tags
+    content = content.replace(/(<li>.*?<\/li>)(?=\s*<li>)/gs, '$1');
+    content = content.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+    
+    // Fix multiple ul tags
+    content = content.replace(/<\/ul>\s*<ul>/g, '');
+    
+    // Add line breaks for better spacing
+    content = content.replace(/\n/g, '<br>');
+    
+    // Close any unclosed emoji sections
+    if (content.includes('<div class="emoji-section">')) {
+        content += '</div>';
+    }
+    
+    treatmentDiv.innerHTML = content;
+}
+
+// Auto-save to localStorage for offline access
+document.addEventListener('DOMContentLoaded', function() {
+    // Format the treatment text
+    formatTreatmentText();
+    
+    const resultData = {
+        diagnosis: `{{ result.diagnosis|escape }}`,
+        treatment: `{{ result.treatment or result.treatment_advice|escape }}`,
+        date: new Date().toISOString(),
+        weather_warning: `{{ result.weather_warning|escape if result.weather_warning else '' }}`
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('last_scan_result', JSON.stringify(resultData));
+});
+
+// Enhanced Voice Assistant for Results Page
+class VoiceAssistantResults {
+    constructor() {
+        this.recognition = null;
+        this.synthesis = window.speechSynthesis;
+        this.isListening = false;
+        this.currentLanguage = 'hi-IN';
+        this.init();
+    }
+
+    init() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            this.setupRecognition();
+        }
+    }
+
+    setupRecognition() {
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+        this.recognition.lang = this.currentLanguage;
+        this.recognition.maxAlternatives = 3;
+
+        this.recognition.onstart = () => {
+            this.isListening = true;
+            this.updateVoiceButton(true);
+            this.showListeningAnimation();
+        };
+
+        this.recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log('Voice transcript:', transcript);
+            this.processVoiceInput(transcript);
+        };
+
+        this.recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            let errorMessage = 'माफ करें, आवाज़ समझने में समस्या हुई।';
+            
+            switch(event.error) {
+                case 'no-speech':
+                    errorMessage = 'कोई आवाज़ नहीं सुनाई दी। कृपया दोबारा कोशिश करें।';
+                    break;
+                case 'audio-capture':
+                    errorMessage = 'माइक्रोफोन की समस्या। कृपया अनुमति दें।';
+                    break;
+                case 'not-allowed':
+                    errorMessage = 'माइक्रोफोन की अनुमति दें।';
+                    break;
+            }
+            
+            this.displayResponse('', errorMessage);
+            this.stopListening();
+        };
+
+        this.recognition.onend = () => {
+            this.stopListening();
+        };
+    }
+
+    startListening() {
+        if (this.recognition && !this.isListening) {
+            this.recognition.start();
+        }
+    }
+
+    stopListening() {
+        this.isListening = false;
+        this.updateVoiceButton(false);
+        this.hideListeningAnimation();
+    }
+
+    async processVoiceInput(transcript) {
+        console.log('Voice input:', transcript);
+        
+        // Show processing
+        this.showProcessingAnimation();
+        
+        try {
+            // Get scan result data from page
+            const scanData = {
+                diagnosis: `{{ result.diagnosis|escape }}`,
+                treatment: `{{ result.treatment_advice|escape }}`,
+                weather_warning: `{{ result.weather_warning|escape if result.weather_warning else '' }}`
+            };
+            
+            // Enhanced context processing for plant-specific queries
+            let enhancedQuery = this.enhanceQueryWithContext(transcript, scanData);
+            
+            // Send to backend for AI processing with scan context
+            const response = await fetch('/api/voice-query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: enhancedQuery,
+                    language: this.currentLanguage,
+                    scan_result: scanData
+                })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Speak the response
+                this.speakResponse(result.response);
+                
+                // Show text response with enhanced formatting
+                this.displayResponse(transcript, result.response);
+                
+                // Add to chat history
+                this.addToChatHistory(transcript, result.response);
+            } else {
+                const fallbackResponse = this.getFallbackResponse(transcript);
+                this.speakResponse(fallbackResponse);
+                this.displayResponse(transcript, fallbackResponse);
+            }
+        } catch (error) {
+            console.error('Voice processing error:', error);
+            const errorResponse = 'कुछ तकनीकी समस्या है। कृपया दोबारा कोशिश करें।';
+            this.speakResponse(errorResponse);
+            this.displayResponse(transcript, errorResponse);
+        }
+        
+        this.hideProcessingAnimation();
+    }
+    
+    enhanceQueryWithContext(query, scanData) {
+        // Add context to make queries more specific
+        const queryLower = query.toLowerCase();
+        
+        if (queryLower.includes('इस पौधे') || queryLower.includes('this plant')) {
+            return `पौधे की समस्या: ${scanData.diagnosis}। किसान का सवाल: ${query}`;
+        }
+        
+        if (queryLower.includes('समस्या') || queryLower.includes('problem')) {
+            return `मेरे पौधे की समस्या: ${scanData.diagnosis}। ${query}`;
+        }
+        
+        if (queryLower.includes('इलाज') || queryLower.includes('treatment')) {
+            return `पौधे का इलाज: ${scanData.treatment.substring(0, 100)}... किसान पूछ रहा: ${query}`;
+        }
+        
+        return query;
+    }
+    
+    getFallbackResponse(query) {
+        const queryLower = query.toLowerCase();
+        
+        if (queryLower.includes('समस्या') || queryLower.includes('problem')) {
+            return 'आपके पौधे की समस्या का विश्लेषण ऊपर दिया गया है। कृपया इलाज की सलाह का पालन करें।';
+        }
+        
+        if (queryLower.includes('इलाज') || queryLower.includes('treatment')) {
+            return 'इलाज की पूरी जानकारी ऊपर दी गई है। नीम का तेल और जैविक उपचार सबसे सुरक्षित हैं।';
+        }
+        
+        if (queryLower.includes('कब') || queryLower.includes('when')) {
+            return 'सुबह 6-9 बजे या शाम 5-7 बजे छिड़काव करें। दोपहर की धूप में न करें।';
+        }
+        
+        return 'माफ करें, मुझे समझने में समस्या हुई है। कृपया दोबारा कोशिश करें।';
+    }
+    
+    addToChatHistory(query, response) {
+        const chatHistory = document.getElementById('chatHistory-results');
+        const chatMessages = document.getElementById('chatMessages-results');
+        
+        if (chatHistory && chatMessages) {
+            chatHistory.style.display = 'block';
+            
+            const conversationDiv = document.createElement('div');
+            conversationDiv.className = 'mb-3 p-3 border rounded';
+            conversationDiv.innerHTML = `
+                <div class="mb-2"><strong>🗣️ आपने पूछा:</strong> ${query}</div>
+                <div><strong>🤖 AI डॉक्टर:</strong> ${response}</div>
+            `;
+            
+            chatMessages.appendChild(conversationDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    }
+
+    speakResponse(text) {
+        if (this.synthesis) {
+            // Cancel any ongoing speech
+            this.synthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = this.currentLanguage;
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+            
+            // Wait for voices to load and find appropriate voice
+            const setVoice = () => {
+                const voices = this.synthesis.getVoices();
+                let selectedVoice = null;
+                
+                if (this.currentLanguage === 'hi-IN') {
+                    // Try to find Hindi voice
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.includes('hi') || 
+                        voice.name.toLowerCase().includes('hindi')
+                    );
+                }
+                
+                if (!selectedVoice) {
+                    // Fallback to any Indian English voice
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.includes('en-IN') ||
+                        voice.name.toLowerCase().includes('indian')
+                    );
+                }
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                
+                this.synthesis.speak(utterance);
+            };
+            
+            if (this.synthesis.getVoices().length === 0) {
+                this.synthesis.addEventListener('voiceschanged', setVoice, { once: true });
+            } else {
+                setVoice();
+            }
+        }
+    }
+
+    updateVoiceButton(listening) {
+        const button = document.getElementById('voice-button-results');
+        const icon = document.getElementById('voice-icon-results');
+        const text = document.getElementById('voice-text-results');
+        
+        if (button) {
+            if (listening) {
+                button.classList.add('listening');
+                icon.innerHTML = '🎤';
+                text.textContent = 'सुन रहा हूँ...';
+            } else {
+                button.classList.remove('listening');
+                icon.innerHTML = '🗣️';
+                text.textContent = 'बोलिए';
+            }
+        }
+    }
+
+    showListeningAnimation() {
+        const animation = document.getElementById('listening-animation-results');
+        if (animation) {
+            animation.style.display = 'block';
+        }
+    }
+
+    hideListeningAnimation() {
+        const animation = document.getElementById('listening-animation-results');
+        if (animation) {
+            animation.style.display = 'none';
+        }
+    }
+
+    showProcessingAnimation() {
+        const processing = document.getElementById('processing-animation-results');
+        if (processing) {
+            processing.style.display = 'block';
+        }
+    }
+
+    hideProcessingAnimation() {
+        const processing = document.getElementById('processing-animation-results');
+        if (processing) {
+            processing.style.display = 'none';
+        }
+    }
+
+    displayResponse(query, response) {
+        const container = document.getElementById('voice-response-results');
+        if (container) {
+            // Enhanced response display with better formatting
+            container.innerHTML = `
+                <div class="voice-conversation">
+                    <div class="user-query">
+                        <strong>🗣️ आपने पूछा:</strong> ${query}
+                    </div>
+                    <div class="ai-response">
+                        <strong>🤖 AI प्लांट डॉक्टर:</strong> ${this.formatResponse(response)}
+                    </div>
+                    <div class="response-actions mt-2">
+                        <button class="btn btn-sm btn-outline-light" onclick="voiceAssistantResults.speakResponse('${response.replace(/'/g, "\\'")}')">🔊 दोबारा सुनें</button>
+                        <button class="btn btn-sm btn-outline-light" onclick="voiceAssistantResults.askFollowUp()">❓ और पूछें</button>
+                    </div>
+                </div>
+            `;
+            container.style.display = 'block';
+        }
+    }
+    
+    formatResponse(response) {
+        // Add emojis and better formatting to response
+        let formatted = response;
+        
+        // Add relevant emojis
+        formatted = formatted.replace(/नीम/g, '🌿 नीम');
+        formatted = formatted.replace(/पानी/g, '💧 पानी');
+        formatted = formatted.replace(/सुबह/g, '🌅 सुबह');
+        formatted = formatted.replace(/शाम/g, '🌆 शाम');
+        formatted = formatted.replace(/छिड़काव/g, '💨 छिड़काव');
+        formatted = formatted.replace(/दिन/g, '📅 दिन');
+        
+        return formatted;
+    }
+    
+    askFollowUp() {
+        const followUpQuestions = [
+            'कितनी बार इलाज करना है?',
+            'नीम का तेल कैसे बनाएं?',
+            'समस्या कब तक ठीक होगी?',
+            'बारिश में क्या करें?',
+            'और कोई घरेलू उपाय?'
+        ];
+        
+        const randomQuestion = followUpQuestions[Math.floor(Math.random() * followUpQuestions.length)];
+        document.getElementById('questionText-results').value = randomQuestion;
+        
+        // Auto-focus on text area
+        document.getElementById('questionText-results').focus();
+    }
+
+    toggleLanguage() {
+        this.currentLanguage = this.currentLanguage === 'hi-IN' ? 'en-IN' : 'hi-IN';
+        if (this.recognition) {
+            this.recognition.lang = this.currentLanguage;
+        }
+        
+        const langButton = document.getElementById('language-toggle-results');
+        if (langButton) {
+            langButton.textContent = this.currentLanguage === 'hi-IN' ? 'हिं' : 'EN';
+        }
+    }
+}
+
+// Initialize voice assistant for results page
+const voiceAssistantResults = new VoiceAssistantResults();
+
+// Global functions for results page
+function startVoiceInputResults() {
+    voiceAssistantResults.startListening();
+}
+
+function toggleLanguageResults() {
+    voiceAssistantResults.toggleLanguage();
+}
+
+function askQuickQuestionResults(question) {
+    document.getElementById('questionText-results').value = question;
+    askQuestionResults();
+}
+
+function askQuestionResults() {
+    const questionText = document.getElementById('questionText-results').value.trim();
+    if (!questionText) {
+        showNotification('Please enter a question first.', 'warning');
+        return;
+    }
+    
+    // Add user question to chat
+    addToChatHistoryResults('user', questionText);
+    
+    // Clear input
+    document.getElementById('questionText-results').value = '';
+    
+    // Show loading response
+    addToChatHistoryResults('ai', 'AI is thinking... 🤔');
+    
+    // Get AI response
+    getAIResponseResults(questionText);
+}
+
+function addToChatHistoryResults(sender, message) {
+    const chatHistory = document.getElementById('chatHistory-results');
+    const chatMessages = document.getElementById('chatMessages-results');
+    
+    // Show chat history if hidden
+    chatHistory.style.display = 'block';
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `mb-2 ${sender === 'user' ? 'text-end' : 'text-start'}`;
+    
+    const bubble = document.createElement('div');
+    bubble.className = `d-inline-block p-2 rounded ${sender === 'user' ? 'bg-primary text-white' : 'bg-light'}`;
+    bubble.style.maxWidth = '80%';
+    
+    if (sender === 'user') {
+        bubble.innerHTML = `<strong>You:</strong> ${message}`;
+    } else {
+        bubble.innerHTML = `<strong>🤖 AI Expert:</strong> ${message}`;
+    }
+    
+    messageDiv.appendChild(bubble);
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function getAIResponseResults(question) {
+    console.log('Sending question to AI:', question);
+    
+    // Get scan result data for context
+    const scanData = {
+        diagnosis: `{{ result.diagnosis|escape }}`,
+        treatment: `{{ result.treatment_advice|escape }}`,
+        weather_warning: `{{ result.weather_warning|escape if result.weather_warning else '' }}`
+    };
+    
+    // Make real API call to the AI service with scan context
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question: question,
+            scan_result: scanData
+        })
+    })
+    .then(response => {
+        console.log('API response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('API response data:', data);
+        
+        // Remove the "thinking" message
+        const chatMessages = document.getElementById('chatMessages-results');
+        if (chatMessages.lastChild) {
+            chatMessages.removeChild(chatMessages.lastChild);
+        }
+        
+        if (data.success) {
+            addToChatHistoryResults('ai', data.response);
+        } else {
+            console.error('API error:', data.error);
+            addToChatHistoryResults('ai', data.error || 'माफ करें, कुछ तकनीकी समस्या है। कृपया दोबारा कोशिश करें।');
+        }
+    })
+    .catch(error => {
+        console.error('Chat API error:', error);
+        
+        // Remove the "thinking" message
+        const chatMessages = document.getElementById('chatMessages-results');
+        if (chatMessages.lastChild) {
+            chatMessages.removeChild(chatMessages.lastChild);
+        }
+        
+        addToChatHistoryResults('ai', 'नेटवर्क की समस्या है। कृपया अपने इंटरनेट कनेक्शन की जांच करें।');
+    });
+}
+
+
+
+// Initialize enhanced voice assistant on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Format treatment text
+    formatTreatmentText();
+    
+    // Auto-save scan result
+    const resultData = {
+        diagnosis: `{{ result.diagnosis|escape }}`,
+        treatment: `{{ result.treatment or result.treatment_advice|escape }}`,
+        date: new Date().toISOString(),
+        weather_warning: `{{ result.weather_warning|escape if result.weather_warning else '' }}`
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('last_scan_result', JSON.stringify(resultData));
+    
+    // Initialize voice assistant
+    console.log('Enhanced AI Assistant initialized for results page');
+});
+</script>
+
+{% endblock %}
