@@ -1,11 +1,23 @@
 import logging
 from PIL import Image
-import torch
+
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
 def analyze_plant_with_huggingface(image_path):
     """Analyze plant image using Hugging Face models"""
+    if not TORCH_AVAILABLE:
+        return {
+            'diagnosis': "PyTorch not available",
+            'treatment': "AI analysis requires PyTorch. Using fallback analysis.",
+            'error': 'Missing PyTorch dependency'
+        }
+    
     try:
         # Try to import transformers
         from transformers import pipeline, AutoImageProcessor, AutoModelForImageClassification
