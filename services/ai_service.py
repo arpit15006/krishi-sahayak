@@ -3,7 +3,7 @@ import requests
 import base64
 import logging
 from services.weather_service import check_rain_forecast
-from services.huggingface_vision import analyze_plant_with_huggingface
+# from services.huggingface_vision import analyze_plant_with_huggingface  # Not used - Gemini is primary
 
 logger = logging.getLogger(__name__)
 
@@ -202,17 +202,7 @@ def analyze_plant_image(image_path, weather_data=None):
         logger.error(f"Gemini Vision API failed: {str(e)}")
         return get_fallback_analysis()
 
-    # Fallback to Hugging Face if Gemini fails
-    try:
-        result = analyze_plant_with_huggingface(image_path)
-        if not result.get('error'):
-            if weather_data:
-                has_rain, rain_message = check_rain_forecast(weather_data)
-                if has_rain:
-                    result['weather_warning'] = f"⚠️ Weather Alert: {rain_message}. Avoid spraying treatments before rain."
-            return result
-    except Exception as e:
-        logger.warning(f"Hugging Face fallback failed: {str(e)}")
+    # No fallback needed - Gemini is primary method
 
     # Final fallback
     return get_ai_error()
