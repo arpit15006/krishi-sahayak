@@ -83,7 +83,7 @@ def time_ago(date_str):
         return 'अभी'
 
 # Import passport routes
-from routes.passport_routes import passport_bp
+from routes_package.passport_routes import passport_bp
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
