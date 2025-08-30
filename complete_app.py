@@ -83,7 +83,7 @@ def time_ago(date_str):
         return 'अभी'
 
 # Import passport routes
-# from routes_package.passport_routes import passport_bp  # Commented out - requires SQLAlchemy
+from routes_package.passport_routes import passport_bp
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -1583,7 +1583,7 @@ def generate_qr_label(token_id):
         return f'<h1>Error</h1><p>Failed to generate QR label: {str(e)}</p>', 500
 
 # Register passport blueprint
-# app.register_blueprint(passport_bp)  # Commented out - requires SQLAlchemy
+app.register_blueprint(passport_bp)
 
 # Test QR generation endpoint
 @app.route('/test-qr')

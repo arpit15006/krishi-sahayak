@@ -1,38 +1,39 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+# Supabase-compatible models (no SQLAlchemy needed)
 from datetime import datetime
 
-class User(db.Model):
-    __tablename__ = 'users'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    phone_number = db.Column(db.String(15), unique=True, nullable=False)
-    full_name = db.Column(db.String(100), nullable=False)
-    village_city = db.Column(db.String(100), nullable=False)
-    pin_code = db.Column(db.String(6), nullable=False)
-    main_crops = db.Column(db.Text, nullable=False)  # JSON string of crop list
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_verified = db.Column(db.Boolean, default=False)
+class User:
+    """User model for Supabase integration"""
+    def __init__(self, data=None):
+        if data:
+            self.id = data.get('id')
+            self.phone_number = data.get('phone_number')
+            self.full_name = data.get('full_name')
+            self.village_city = data.get('village_city')
+            self.pin_code = data.get('pin_code')
+            self.main_crops = data.get('main_crops', '[]')
+            self.created_at = data.get('created_at')
+            self.is_verified = data.get('is_verified', False)
 
-class ScanResult(db.Model):
-    __tablename__ = 'scan_results'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    image_filename = db.Column(db.String(255), nullable=False)
-    diagnosis = db.Column(db.Text, nullable=False)
-    treatment_advice = db.Column(db.Text, nullable=False)
-    weather_warning = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class ScanResult:
+    """Scan result model for Supabase integration"""
+    def __init__(self, data=None):
+        if data:
+            self.id = data.get('id')
+            self.user_id = data.get('user_id')
+            self.image_filename = data.get('image_filename')
+            self.diagnosis = data.get('diagnosis')
+            self.treatment_advice = data.get('treatment_advice')
+            self.weather_warning = data.get('weather_warning')
+            self.created_at = data.get('created_at')
 
-class DigitalPassport(db.Model):
-    __tablename__ = 'digital_passports'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    crop_type = db.Column(db.String(100), nullable=False)
-    season = db.Column(db.String(50), nullable=False)
-    nft_token_id = db.Column(db.String(100))
-    ipfs_hash = db.Column(db.String(100))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class DigitalPassport:
+    """Digital passport model for Supabase integration"""
+    def __init__(self, data=None):
+        if data:
+            self.id = data.get('id')
+            self.user_id = data.get('user_id')
+            self.crop_type = data.get('crop_type')
+            self.season = data.get('season')
+            self.nft_token_id = data.get('nft_token_id')
+            self.ipfs_hash = data.get('ipfs_hash')
+            self.created_at = data.get('created_at')
