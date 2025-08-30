@@ -13,9 +13,9 @@ qrcode==7.4.2
 reportlab==4.0.4
 python-dateutil==2.8.2
 flask-cors==4.0.0
-torch==2.1.0
-torchvision==0.16.0
-transformers==4.35.0
+torch==2.5.1
+torchvision==0.20.1
+transformers==4.46.0
 groq==0.4.1
 google-generativeai==0.3.2
 speechrecognition==3.10.0
