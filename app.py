@@ -40,7 +40,7 @@ def create_app():
     
     # Register new Supabase routes
     try:
-        from routes.farmer_routes import farmer_bp
+        from routes_package.farmer_routes import farmer_bp
         app.register_blueprint(farmer_bp)
     except ImportError:
         pass
