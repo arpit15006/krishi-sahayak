@@ -35,8 +35,8 @@ def create_app():
     db.init_app(app)
     
     # Import and register routes
-    from routes import bp as main_bp
-    app.register_blueprint(main_bp)
+    import routes
+    app.register_blueprint(routes.bp)
     
     # Register new Supabase routes
     try:
