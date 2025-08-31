@@ -106,7 +106,7 @@ Krishi Sahayak is a comprehensive AI-powered Progressive Web App that addresses 
 ### **AI & APIs**
 ```
 🤖 Plant Analysis: Google Gemini Vision API
-🌤️ Weather Data: AccuWeather API
+🌤️ Weather Data: WeatherAPI.com API Key
 💰 Market Prices: Government AGMARKNET API
 🗣️ Voice Processing: Groq API with Llama models
 🛰️ Satellite Data: NASA GIBS API
@@ -114,7 +114,7 @@ Krishi Sahayak is a comprehensive AI-powered Progressive Web App that addresses 
 
 ### **Blockchain & Security**
 ```
-⛓️ Blockchain: Polygon Mumbai Testnet
+⛓️ Blockchain: Monad Testnet
 🏷️ NFT Standard: ERC-721 for certificates
 📦 Storage: IPFS via Pinata
 🔒 Security: HTTPS, JWT, Input validation
@@ -132,7 +132,7 @@ Krishi Sahayak is a comprehensive AI-powered Progressive Web App that addresses 
 ### **Quick Start**
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/krishi-sahayak.git
+git clone https://github.com/arpit15006/krishi-sahayak.git
 cd krishi-sahayak
 
 # Make startup script executable
@@ -325,42 +325,21 @@ PORT=8000
 # Contribute to the project
 git clone https://github.com/your-username/krishi-sahayak.git
 cd krishi-sahayak
-
-# Create feature branch
-git checkout -b feature/amazing-feature
-
-# Make changes and commit
-git commit -m 'Add amazing feature'
-
-# Push and create PR
-git push origin feature/amazing-feature
 ```
-
 ---
 
 ## 📞 Contact & Support
 
-### **Hackathon Judges & Mentors**
-- 📧 **Email**: team@krishisahayak.com
-- 🌐 **Website**: https://krishisahayak.com
-- 📱 **Demo**: https://demo.krishisahayak.com
-- 📋 **Presentation**: [View Slides](https://slides.krishisahayak.com)
+### **Developer**
+- 📧 **Email**: arpit6814@gmail.com
+- 🌐 **Website**: [Deployed Link](https://krishi-sahayak-1.onrender.com)
+- 📋 **Presentation**: [View Slides]([https://slides.krishisahayak.com](https://docs.google.com/presentation/d/1f1W263PK-oVkpJZc5WapW3DtzDeBl34P5Ua1qXp9XF8/edit?usp=sharing)
 
 ### **Social Media**
-- 🐦 **Twitter**: [@KrishiSahayak](https://twitter.com/krishisahayak)
-- 💼 **LinkedIn**: [Krishi Sahayak](https://linkedin.com/company/krishisahayak)
+- 💼 **LinkedIn**: [Developer](www.linkedin.com/in/arpit-kumar-patel-260238324)
 - 📺 **YouTube**: [Demo Videos](https://youtube.com/@krishisahayak)
 
 ---
-
-## 📄 License & Legal
-
-### **Open Source License**
-```
-MIT License - Free for educational and non-commercial use
-Commercial licensing available for enterprises
-Patent pending for AI plant disease detection algorithm
-```
 
 ### **API Credits**
 - Google Gemini Vision API for plant analysis
@@ -382,6 +361,6 @@ Patent pending for AI plant disease detection algorithm
 
 *Built with ❤️ for Indian farmers by developers who believe technology can transform agriculture.*
 
-**#KrishiSahayak #AIForAgriculture #DigitalIndia #FarmTech #Hackathon2024**
+**#KrishiSahayak #AIForAgriculture #DigitalIndia #FarmTech**
 
 </div>
